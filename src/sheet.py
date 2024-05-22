@@ -7,7 +7,7 @@ class Chalk:
 class Duster:
     def __init__(self, rectangle: tuple[int, int], color: tuple[int, int, int, int]) -> None:
         width, height = rectangle
-        trace = [[color for _ in range(0, width)] for _ in range(0, width)]
+        trace = [[color for _ in range(0, width)] for _ in range(0, height)]
         self.chalk = Chalk(trace)
     
 class BloxelBoard:
@@ -64,7 +64,7 @@ background = (50, 50, 50)
 
 board = BloxelBoard((480, 480), background)
 
-duster = Duster((50, 50), (50, 50, 50, 100))
+duster = Duster((50, 50), (50, 50, 50, 225))
 
 chalk = Chalk(trace)
 board.mark(chalk, (240, 240))
@@ -76,7 +76,7 @@ for j in range(40, 440):
 for x in range(40, 440):
    board.mark(chalk, (x, x))
    
-for _ in range(0, 20):
+for _ in range(0, 2):
     board.erase((240, 240), duster)
 
 board.save("temp_sheet7.png")
