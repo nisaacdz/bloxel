@@ -4,10 +4,11 @@ class Chalk:
     def __init__(self, trace: list[list[tuple[int, int, int, int]]]) -> None:
         self.trace = trace
     
-class Eraser:
-    def __init__(self, rectangle: tuple[int, int]) -> None:
-        self.rectangle = rectangle
-    
+class Duster:
+    def __init__(self, rectangle: tuple[int, int], color: tuple[int, int, int, int]) -> None:
+        width, height = rectangle
+        trace = [[color for _ in range(0, width)] for _ in range(0, width)]
+        self.chalk = Chalk(trace)
     
 class BloxelBoard:
     def __init__(self, size: tuple[int, int], background: tuple[int, int, int]):
@@ -19,8 +20,8 @@ class BloxelBoard:
     
     def mark(self, chalk: Chalk, pos: tuple[int, int]):
         trace = chalk.trace
-        midi = int(len(trace) / 2)
-        midj = int(len(trace[0]) / 2)
+        midi = len(trace) // 2
+        midj = len(trace[0]) // 2
         x, y = pos
         width, height = self.board.size
         for tj in range(0, len(trace)):
@@ -38,23 +39,13 @@ class BloxelBoard:
                     self.board.putpixel((ni, nj), (int(r), int(g), int(b)))
                 
         
-    def erase(self, pos: tuple[int, int], eraser: Eraser):
-        e_width, e_height = eraser.rectangle
-        width, height = self.board.size
-        midi = e_width / 2
-        midj = e_height / 2
-        x, y = pos
-        for ei in range(0, e_width):
-            for ej in range(0, e_height):
-                ni = x + ei - midi
-                nj = y + ej - midj
-                if ni >= 0 and ni < width and nj >= 0 and nj < height:
-                    self.board.putpixel((ni, nj), self.background)
+    def erase(self, pos: tuple[int, int], duster: Duster):
+        self.mark(duster.chalk, pos)
         
 trace = [[(0,0,0,0) for _ in range(0, 21)] for _ in range(0, 21)]
 
-midi = int(len(trace) / 2)
-midj = int(len(trace[0]) / 2)
+midi = len(trace) // 2
+midj = len(trace[0]) // 2
 max_dist = max(midi, midj)**2
 
 for i in range(0, len(trace)):
@@ -73,6 +64,8 @@ background = (50, 50, 50)
 
 board = BloxelBoard((480, 480), background)
 
+duster = Duster((50, 50), (50, 50, 50, 100))
+
 chalk = Chalk(trace)
 board.mark(chalk, (240, 240))
 
@@ -82,5 +75,8 @@ for j in range(40, 440):
    board.mark(chalk, (40, j))
 for x in range(40, 440):
    board.mark(chalk, (x, x))
+   
+for _ in range(0, 20):
+    board.erase((240, 240), duster)
 
 board.save("temp_sheet7.png")
