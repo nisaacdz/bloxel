@@ -66,7 +66,6 @@ class BloxelBoard:
     
     def save(self, location: str):
         self.board.save(location)
-
         
     
     def draw(self, pad: OverPad, pos: tuple[int, int]):
