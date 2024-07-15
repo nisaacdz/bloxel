@@ -677,11 +677,15 @@ const DEFAULT_CHALK_TRACE = [
 ];
 
 class ModifierTool {
-    constructor(pad) {
-        this.pad = pad;
-    }
+  constructor(trace) {
+    this.trace = trace;
+  }
 
-    getPad() {
-        return this.pad;
-    }
+  getTrace() {
+    return this.trace;
+  }
 }
+
+const DefaultChalk = new ModifierTool(DEFAULT_CHALK_TRACE);
+
+export default DefaultChalk;

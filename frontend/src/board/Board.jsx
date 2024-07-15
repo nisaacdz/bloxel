@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useRef } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef, useEffect } from 'react';
 import './Board.css';
 
 const Board = forwardRef(({ mouseDownHandler, mouseMoveHandler, mouseUpHandler, mouseLeaveHandler }, ref) => {
@@ -7,7 +7,7 @@ const Board = forwardRef(({ mouseDownHandler, mouseMoveHandler, mouseUpHandler, 
   useImperativeHandle(ref, () => ({
     setPixelColor: (x, y, color) => {
       const ctx = canvasRef.current.getContext('2d');
-      ctx.fillStyle = color;
+      ctx.fillStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
       ctx.fillRect(x, y, 1, 1);
     },
     width: () => {
@@ -24,7 +24,7 @@ const Board = forwardRef(({ mouseDownHandler, mouseMoveHandler, mouseUpHandler, 
     moveScreen: (xtrans, ytrans) => {
       // Implementation for moving the screen
     }
-  }), [canvasRef]);
+  }), []);
 
   const handleMouseDown = (event) => {
     const rect = event.target.getBoundingClientRect();
@@ -48,8 +48,16 @@ const Board = forwardRef(({ mouseDownHandler, mouseMoveHandler, mouseUpHandler, 
     mouseLeaveHandler();
   };
 
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+  }, []);
+  
+
   return (
-    <canvas
+    <div id="boardcontainer">
+      <canvas
       id="board"
       ref={canvasRef}
       onMouseDown={handleMouseDown}
@@ -57,6 +65,7 @@ const Board = forwardRef(({ mouseDownHandler, mouseMoveHandler, mouseUpHandler, 
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseLeave}
     />
+    </div>
   );
 });
 

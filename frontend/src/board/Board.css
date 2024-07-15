@@ -1,8 +1,15 @@
+#boardcontainer {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: 15px;
+  bottom: 75px;
+  background-color: green;
+}
+
 #board {
-    position: absolute;
-    left: 20px;
-    right: 20px;
-    top: 15px;
-    bottom: 75px;
-    background-color: whitesmoke;
-  }
+  width: 100%;
+  height: 100%;
+  background-color: rgb(50, 50, 50);
+  box-sizing: border-box;
+}
