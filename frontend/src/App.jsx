@@ -3,10 +3,11 @@ import "./App.css";
 import Board from "./board/Board";
 import DefaultChalk from "./padding";
 
+
 function App() {
   const boardRef = useRef(null);
   const activeMouseRef = useRef(null);
-  const [chalk, setChalk] = useState(DefaultChalk);
+  const [chalk, _] = useState(DefaultChalk);
 
   const mouseTouchBoard = () => {
     if (boardRef.current != null && activeMouseRef.current != null) {
@@ -24,8 +25,8 @@ function App() {
         for (let ti = 0; ti < trace[0].length; ti++) {
           const [r1, g1, b1, a] = trace[tj][ti];
 
-          const ni = mouseX + ti - midi; // Removed comment, performs floor division
-          const nj = mouseY + tj - midj; // Removed comment, performs floor division
+          const ni = mouseX + ti - midi;
+          const nj = mouseY + tj - midj;
 
           if (ni >= 0 && ni < boardWidth && nj >= 0 && nj < boardHeight) {
             const [r2, g2, b2] = board.getPixelColor(ni, nj);
