@@ -1,0 +1,5 @@
+#pointer-tool {
+    position: relative;
+    pointer-events: none;
+    display: none;
+}

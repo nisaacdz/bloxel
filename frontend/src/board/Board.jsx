@@ -64,7 +64,7 @@ const Board = forwardRef(
     };
 
     useEffect(() => {
-      const canvas = canvasRef.current; // Make sure you have this line
+      const canvas = canvasRef.current;
       canvas.width = canvas.clientWidth;
       canvas.height = canvas.clientHeight;
       const ctx = canvas.getContext("2d");
@@ -73,15 +73,14 @@ const Board = forwardRef(
     }, []);
 
     return (
-      <div id="boardcontainer">
-        <canvas
-          id="board"
-          ref={canvasRef}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseLeave}
-        />
+      <div
+        id="boardcontainer"
+        onPointerDown={handleMouseDown}
+        onPointerMove={handleMouseMove}
+        onPointerUp={handleMouseUp}
+        onPointerLeave={handleMouseLeave}
+      >
+        <canvas id="board" ref={canvasRef} />
       </div>
     );
   }

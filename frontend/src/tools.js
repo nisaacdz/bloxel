@@ -676,16 +676,43 @@ const DEFAULT_CHALK_TRACE = [
   ],
 ];
 
+class Duster {
+  constructor(background) {
+    this.background = background;
+  }
+
+  idx(x, y) {
+    return this.background;
+  }
+
+  sizeX() {
+    return 40;
+  }
+
+  sizeY() {
+    return 50;
+  }
+}
+
+
 class ModifierTool {
   constructor(trace) {
     this.trace = trace;
   }
 
-  getTrace() {
-    return this.trace;
+  idx(x, y) {
+    return this.trace[x][y];
+  }
+
+  sizeX() {
+    return this.trace.length;
+  }
+
+  sizeY() {
+    return this.trace[0].length;
   }
 }
 
-const DefaultChalk = new ModifierTool(DEFAULT_CHALK_TRACE);
+export const DefaultChalk = new ModifierTool(DEFAULT_CHALK_TRACE);
 
-export default DefaultChalk;
+export const DefaultDuster = new Duster([50, 50, 50, 255]);
