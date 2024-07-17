@@ -12,9 +12,11 @@ function App() {
   const activeMouseRef = useRef(null);
   const [tool_idx, setToolIdx] = useState(0);
 
-  const mouseTouchBoard = () => {
+  const escribe = () => {
     if (boardRef.current != null && activeMouseRef.current != null) {
-      const { x: mouseX, y: mouseY } = activeMouseRef.current;
+      const [mouseX, mouseY] = boardRef.current.get_bounded_position(
+        activeMouseRef.current
+      );
       const board = boardRef.current;
 
       const boardWidth = board.width();
@@ -52,37 +54,38 @@ function App() {
     }
   };
 
-  const mouseMoveHandler = (x, y) => {
-    if (
-      x >= 0 &&
-      y >= 0 &&
-      x < boardRef.current.width() &&
-      y < boardRef.current.height()
-    ) {
-      pointerToolRef.current.show();
-      pointerToolRef.current.translate(x, y);
-    } else {
+  const pointerMoveHandler = (event) => {
+    const x = event.clientX;
+    const y = event.clientY;
+    if (!boardRef.current.within_bounds(x, y)) {
       pointerToolRef.current.hide();
+      return;
     }
+    pointerToolRef.current.show();
+    pointerToolRef.current.reposition(x, y);
     if (
       activeMouseRef.current != null &&
       (activeMouseRef.current.x !== x || activeMouseRef.current.y !== y)
     ) {
-      activeMouseRef.current = { x: x, y: y };
-      mouseTouchBoard();
+      activeMouseRef.current = { xPos: x, yPos: y };
+      escribe();
     }
   };
 
-  const mouseDownHandler = (x, y) => {
-    activeMouseRef.current = { x: -1, y: -1 };
-    mouseMoveHandler(x, y);
+  const pointerDownHandler = (event) => {
+    const x = event.clientX;
+    const y = event.clientY;
+    if (event.button == 0 && boardRef.current.within_bounds(x, y)) {
+      activeMouseRef.current = { xPos: x, yPos: y };
+      escribe();
+    }
   };
 
-  const mouseUpHandler = () => {
+  const pointerUpHandler = (event) => {
     activeMouseRef.current = null;
   };
 
-  const mouseLeaveHandler = () => {
+  const pointerLeaveHandler = (event) => {
     pointerToolRef.current.hide();
   };
 
@@ -93,14 +96,15 @@ function App() {
   const toolName = tool_idx === 0 ? "Chalk" : "Duster";
 
   return (
-    <div id="content" draggable="false">
-      <Board
-        mouseDownHandler={mouseDownHandler}
-        mouseMoveHandler={mouseMoveHandler}
-        mouseUpHandler={mouseUpHandler}
-        mouseLeaveHandler={mouseLeaveHandler}
-        ref={boardRef}
-      />
+    <div
+      id="content"
+      draggable="false"
+      onPointerDown={pointerDownHandler}
+      onPointerMove={pointerMoveHandler}
+      onPointerUp={pointerUpHandler}
+      onPointerLeave={pointerLeaveHandler}
+    >
+      <Board ref={boardRef} />
       <div id="toggle-button" onClick={changeTool}>
         {toolName}
       </div>
