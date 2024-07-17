@@ -99,6 +99,10 @@ function App() {
     <div
       id="content"
       draggable="false"
+      onTouchStart={pointerDownHandler}
+      onTouchMove={pointerMoveHandler}
+      onTouchEnd={pointerUpHandler}
+      onTouchCancel={pointerLeaveHandler}
       onPointerDown={pointerDownHandler}
       onPointerMove={pointerMoveHandler}
       onPointerUp={pointerUpHandler}
