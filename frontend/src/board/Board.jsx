@@ -34,7 +34,7 @@ const Board = forwardRef(({}, ref) => {
           y < canvasRef.current.height
         );
       },
-      get_bounded_position: ({xPos: x, yPos: y}) => {
+      get_bounded_position: ({ xPos: x, yPos: y }) => {
         const rect = canvasRef.current.getBoundingClientRect();
         return [x - rect.left, y - rect.top];
       },
@@ -52,11 +52,20 @@ const Board = forwardRef(({}, ref) => {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
-    const ctx = canvas.getContext("2d");
-    ctx.fillStyle = "rgb(50, 50, 50)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const handleResize = () => {
+      canvas.width = canvas.clientWidth;
+      canvas.height = canvas.clientHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "rgb(50, 50, 50)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    };
+
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   return (
