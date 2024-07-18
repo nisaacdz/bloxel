@@ -23,8 +23,8 @@ function App() {
       const boardHeight = board.height();
       const tool = TOOLS[tool_idx];
 
-      const midi = Math.floor(tool.sizeX() / 2);
-      const midj = Math.floor(tool.sizeY() / 2);
+      const midi = Math.floor(tool.sizeY() / 2);
+      const midj = Math.floor(tool.sizeX() / 2);
 
       for (let tj = 0; tj < tool.sizeX(); tj++) {
         for (let ti = 0; ti < tool.sizeY(); ti++) {
@@ -61,6 +61,7 @@ function App() {
       pointerToolRef.current.hide();
       return;
     }
+    event.preventDefault();
     pointerToolRef.current.show();
     pointerToolRef.current.reposition(x, y);
     if (
@@ -76,6 +77,7 @@ function App() {
     const x = event.clientX;
     const y = event.clientY;
     if (event.button == 0 && boardRef.current.within_bounds(x, y)) {
+      event.preventDefault();
       activeMouseRef.current = { xPos: x, yPos: y };
       escribe();
     }
@@ -107,6 +109,7 @@ function App() {
       onPointerMove={pointerMoveHandler}
       onPointerUp={pointerUpHandler}
       onPointerLeave={pointerLeaveHandler}
+      onPointerCancel={pointerLeaveHandler}
     >
       <Board ref={boardRef} />
       <div id="toggle-button" onClick={changeTool}>

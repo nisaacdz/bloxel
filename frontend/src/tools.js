@@ -685,15 +685,22 @@ class Duster {
     return this.background;
   }
 
+  idx_ptr(x, y) {
+    if (x < 2 || x >= this.sizeX() - 2 || y < 2 || y >= this.sizeY() - 2) {
+      return complement(this.idx(x, y));
+    } else {
+      return this.idx(x, y);
+    }
+  }
+
   sizeX() {
-    return 40;
+    return 60;
   }
 
   sizeY() {
-    return 50;
+    return 100;
   }
 }
-
 
 class ModifierTool {
   constructor(trace) {
@@ -704,6 +711,11 @@ class ModifierTool {
     return this.trace[x][y];
   }
 
+  idx_ptr(x, y) {
+    const [r, g, b, a] = this.idx(x, y);
+    return [r, g, b, Math.floor(0.8 * a)];
+  }
+
   sizeX() {
     return this.trace.length;
   }
@@ -711,6 +723,11 @@ class ModifierTool {
   sizeY() {
     return this.trace[0].length;
   }
+}
+
+function complement(color) {
+  const [r, g, b, a] = color;
+  return [255 - r, 255 - g, 255 - b, a];
 }
 
 export const DefaultChalk = new ModifierTool(DEFAULT_CHALK_TRACE);
