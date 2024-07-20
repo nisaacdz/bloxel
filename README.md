@@ -12,7 +12,8 @@ Algorithms to correct straight lines, ensuring your drawings and notes are clean
 To detect straight lines, we points with equal intervals are sampled along a line, then the standard diviation of the gradients between successive points are calculated. If this standard deviation falls within a treshold, it is considered a straight line with gradient equal to the average gradient and passes through the centroid of sampled points. 
 
 ### Export to PDF and PPT
-Currently incorporating libraries for conversion of canvas to pdf, png, jpg, ppt, etc. Soon to add more tools to increase functionality.
+Currently incorporating libraries for conversion of canvas to pdf, png, jpg, ppt, etc.
+Also, I will soon to add more tools like undo, redo, next page, drag page, etc.
 
 ## Screenshots
 
