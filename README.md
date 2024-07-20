@@ -13,7 +13,7 @@ To detect straight lines, we points with equal intervals are sampled along a lin
 
 ### Export to PDF and PPT
 Currently incorporating libraries for conversion of canvas to pdf, png, jpg, ppt, etc.
-Also, I will soon to add more tools like undo, redo, next page, drag page, etc.
+More tools like undo, redo, next page, drag page, etc. will be coming soon.
 
 ## Screenshots
 
