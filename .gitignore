@@ -8,9 +8,9 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # Build Artifacts
-node_modules
-dist
-dist-ssr
+**/node_modules
+**/dist
+**/dist-ssr
 
 # Local Files
 *.local
@@ -26,7 +26,7 @@ dist-ssr
 *.sln
 *.sw?
 
-/target/
+**/target/
 
 # Unnecessary Configuration Files
 .prettierrc
