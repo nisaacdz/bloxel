@@ -1,10 +1,10 @@
 import { useRef, useState } from "react";
 import "./App.css";
 import Board from "./board/Board";
-import { DefaultChalk, DefaultDuster } from "./tools";
+import { DefaultChalk, DefaultDuster, ChalkVar1, ChalkVar2 } from "./tools";
 import Pointer from "./Pointer";
 
-const TOOLS = [DefaultChalk, DefaultDuster];
+const TOOLS = [DefaultChalk, DefaultDuster, ChalkVar1, ChalkVar2];
 
 function App() {
   const boardRef = useRef(null);
@@ -95,7 +95,7 @@ function App() {
     setToolIdx((prevToolIdx) => (prevToolIdx + 1) % TOOLS.length);
   };
 
-  const toolName = tool_idx === 0 ? "Chalk" : "Duster";
+  const toolName = TOOLS[tool_idx].name();
 
   return (
     <div

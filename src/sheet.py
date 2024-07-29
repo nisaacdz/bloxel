@@ -93,11 +93,9 @@ class BloxelBoard:
         self.draw(duster.pad, pos)
 
 
-"""
 
-
-color1 = 230, 70, 120
-color2 = 210, 230, 250
+color1 = 180, 230, 30
+color2 = 255, 255, 255
 
 
 def merge_bases(val1: int, val2: int) -> tuple[int, int, int]:
@@ -108,7 +106,8 @@ def merge_bases(val1: int, val2: int) -> tuple[int, int, int]:
     blue = int((val1*blue1 + val2*blue2) / (val1 + val2))
     return red, green, blue
 
-trace = [[(0,0,0,0) for _ in range(0, 25)] for _ in range(0, 25)]
+
+trace = [[(0,0,0,0) for _ in range(0, 15)] for _ in range(0, 15)]
 
 midi = len(trace) // 2
 midj = len(trace[0]) // 2
@@ -120,14 +119,14 @@ for i in range(0, len(trace)):
         alpha = min(max(0, int(255 - 255 * dist / max_dist)), 255)
         red, green, blue = 255, 255, 255
         shift = abs(midj - j)
-        if shift <= 5:
+        if shift <= 3:
             r = shift
-            w = 5 - shift
-            red, green, blue = merge_bases(r**4, w**4)
-        elif shift <= 10:
-            r = 10 - shift
-            w = shift - 5
-            red, green, blue = merge_bases(r**4, w**4)
+            w = 3 - shift
+            red, green, blue = merge_bases(r**2, w**2)
+        elif shift <= 6:
+            r = 6 - shift
+            w = shift - 3
+            red, green, blue = merge_bases(r**2, w**2)
         else:
             red, green, blue = color2
         trace[i][j] = red, green, blue, alpha
@@ -140,13 +139,11 @@ background = (50, 50, 50)
 board = BloxelBoard((480, 480), background)
 
 duster = Duster((50, 50), (*board.background, 255))
-chalk = Chalk(trace)
+chalk = Chalk(OverPad(trace))
 
-board.mark(chalk, (120, 240))
+board.draw(chalk.overpad, (120, 240))
 
 for j in range(200, 360):
-    board.mark(chalk, (j, 240))
+    board.draw(chalk.overpad, (j, 240))
     
-board.save('temp_sheet330.png')
-
-"""
+board.save('temp_sheet3.png')
