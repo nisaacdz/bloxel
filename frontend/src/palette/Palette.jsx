@@ -2,6 +2,7 @@ import "./Palette.css";
 import { useState } from "react";
 import ChalkTool from "./tools/Chalk/Chalk";
 import DusterTool from "./tools/Duster/Duster";
+import ClearTool from "./tools/Clear";
 
 const Palette = ({
   colorIdx,
@@ -9,6 +10,7 @@ const Palette = ({
   designIdx,
   updateDesignIdx,
   updateActiveTool,
+  clearDrawingBoard
 }) => {
   return (
     <div id="palette">
@@ -20,6 +22,7 @@ const Palette = ({
         updateActiveTool={updateActiveTool}
       />
       <DusterTool updateActiveTool={updateActiveTool} />
+      <ClearTool clearDrawingBoard={clearDrawingBoard}/>
     </div>
   );
 };

@@ -2,11 +2,13 @@ import React, {
   forwardRef,
   useImperativeHandle,
   useRef,
+  useState,
   useEffect,
 } from "react";
 import "./Board.css";
 
 const Board = forwardRef(({}, ref) => {
+  const [toggleClear, setToggleClear] = useState(false);
   const canvasRef = useRef(null);
 
   useImperativeHandle(
@@ -43,8 +45,8 @@ const Board = forwardRef(({}, ref) => {
         const pixelData = ctx.getImageData(x, y, 1, 1).data;
         return [pixelData[0], pixelData[1], pixelData[2]];
       },
-      moveScreen: (xtrans, ytrans) => {
-        // Implementation for moving the screen
+      clearAll: () => {
+        setToggleClear((prev) => !prev);
       },
     }),
     []
@@ -66,7 +68,7 @@ const Board = forwardRef(({}, ref) => {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  }, [toggleClear]);
 
   return (
     <div id="boardcontainer">

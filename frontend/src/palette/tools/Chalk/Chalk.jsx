@@ -40,14 +40,14 @@ const ColorPalette = ({ colorIdx, updateColorIdx, setShowColors }) => {
   );
 };
 
-const ChalkDesignPreview = ({ design, color }) => {
+const ChalkDesignPreview = ({ designIdx, colorIdx }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
 
-    const chalk = createChalk(design, color);
+    const chalk = createChalk(DESIGNS[designIdx], COLORS[colorIdx]);
 
     const width = chalk.sizeX();
     const height = chalk.sizeY();
@@ -65,41 +65,40 @@ const ChalkDesignPreview = ({ design, color }) => {
         ctx.putImageData(imageData, y, x);
       }
     }
-  }, []);
+  }, [designIdx, colorIdx]);
 
-  return (
-    <canvas
-      ref={canvasRef}
-      onScrollCapture={1.5}
-      width="20px"
-      height="20px"
-    ></canvas>
-  );
+  return <canvas ref={canvasRef} width="20px" height="20px"></canvas>;
 };
 
 const DesignPalette = ({
   designIdx,
   updateDesignIdx,
   setShowDesigns,
-  color,
+  colorIdx,
 }) => {
   return (
     <div id="design-palette">
-      {DESIGNS.map((design, idx) => (
-        <div
-          key={idx}
-          className={`chalk-design ${
-            idx === designIdx ? "active" : "inactive"
-          }`}
-          onClick={(event) => {
-            event.stopPropagation();
-            updateDesignIdx(idx);
-            setShowDesigns(false);
-          }}
-        >
-          <ChalkDesignPreview key={idx} design={design} color={color} />
-        </div>
-      ))}
+      {Array.from({ length: DESIGNS.length }, (value, index) => index).map(
+        (idx) => (
+          <div
+            key={idx}
+            className={`chalk-design ${
+              idx === designIdx ? "active" : "inactive"
+            }`}
+            onClick={(event) => {
+              event.stopPropagation();
+              updateDesignIdx(idx);
+              setShowDesigns(false);
+            }}
+          >
+            <ChalkDesignPreview
+              key={idx}
+              designIdx={idx}
+              colorIdx={colorIdx}
+            />
+          </div>
+        )
+      )}
     </div>
   );
 };
@@ -140,20 +139,19 @@ const ChalkTool = ({
           designIdx={designIdx}
           updateDesignIdx={updateDesignIdx}
           setShowDesigns={setShowDesigns}
-          color={COLORS[colorIdx]}
+          colorIdx={colorIdx}
         />
       ) : (
         <div
           id="chalk-preview"
-          onClick={(event) => {
-            event.stopPropagation();
+          onClick={() => {
             setShowDesigns(true);
           }}
         >
           <ChalkDesignPreview
             key={designIdx}
-            design={DESIGNS[designIdx]}
-            color={COLORS[colorIdx]}
+            designIdx={designIdx}
+            colorIdx={colorIdx}
           />
         </div>
       )}

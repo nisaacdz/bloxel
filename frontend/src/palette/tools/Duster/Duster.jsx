@@ -7,7 +7,7 @@ const DusterTool = ({updateActiveTool}) => {
         updateActiveTool(DefaultDuster)
     };
     return (<div id="duster-tool" onClick={handleClick}>
-        Duster
+        <img id="duster-tool-img" src="./eraser2.svg" alt="easer-img"/>
     </div>)
 };
 

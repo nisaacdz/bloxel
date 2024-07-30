@@ -589,6 +589,6 @@ export const COLORS = [
   [0, 64, 64],
   [165, 75, 165],
   [255, 127, 50],
-  [255, 255, 255]
+  [255, 255, 255],
 ];
 export const DESIGNS = [DEFAULT_CHALK_TRACE, SOLID_CHALK_TRACE];

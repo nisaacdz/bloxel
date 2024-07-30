@@ -24,6 +24,12 @@
     gap: 2px;
   }
   
+ .chalk-design {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+ }
+
   .color-palette-item, .chalk-design {
     width: 20px;
     height: 20px;

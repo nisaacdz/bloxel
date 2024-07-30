@@ -4,7 +4,6 @@ import Board from "./board/Board";
 import { DefaultChalk, COLORS, DESIGNS } from "./chalks";
 import { DefaultDuster } from "./duster";
 import Pointer from "./Pointer";
-import AppContext from "./AppContext";
 import Palette from "./palette/Palette";
 
 function App() {
@@ -100,6 +99,10 @@ function App() {
     }
   };
 
+  const clearDrawingBoard = () => {
+    boardRef.current.clearAll();
+  };
+
   const pointerUpHandler = (event) => {
     activeMouseRef.current = null;
   };
@@ -109,31 +112,35 @@ function App() {
   };
 
   return (
-    <AppContext.Provider>
-      <div
-        id="content"
-        draggable="false"
-        onTouchStart={pointerDownHandler}
-        onTouchMove={pointerMoveHandler}
-        onTouchEnd={pointerUpHandler}
-        onTouchCancel={pointerLeaveHandler}
-        onPointerDown={pointerDownHandler}
-        onPointerMove={pointerMoveHandler}
-        onPointerUp={pointerUpHandler}
-        onPointerLeave={pointerLeaveHandler}
-        onPointerCancel={pointerLeaveHandler}
-      >
-        <Board ref={boardRef} />
-        <Palette
-          updateActiveTool={updateActiveTool}
-          colorIdx={colorIdx}
-          designIdx={designIdx}
-          updateColorIdx={updateColorIdx}
-          updateDesignIdx={updateDesignIdx}
-        />
-        <Pointer ref={pointerToolRef} colorIdx={colorIdx} designIdx = {designIdx} activeTool={activeTool}/>
-      </div>
-    </AppContext.Provider>
+    <div
+      id="content"
+      draggable="false"
+      onTouchStart={pointerDownHandler}
+      onTouchMove={pointerMoveHandler}
+      onTouchEnd={pointerUpHandler}
+      onTouchCancel={pointerLeaveHandler}
+      onPointerDown={pointerDownHandler}
+      onPointerMove={pointerMoveHandler}
+      onPointerUp={pointerUpHandler}
+      onPointerLeave={pointerLeaveHandler}
+      onPointerCancel={pointerLeaveHandler}
+    >
+      <Board ref={boardRef} />
+      <Palette
+        updateActiveTool={updateActiveTool}
+        colorIdx={colorIdx}
+        designIdx={designIdx}
+        updateColorIdx={updateColorIdx}
+        updateDesignIdx={updateDesignIdx}
+        clearDrawingBoard={clearDrawingBoard}
+      />
+      <Pointer
+        ref={pointerToolRef}
+        colorIdx={colorIdx}
+        designIdx={designIdx}
+        activeTool={activeTool}
+      />
+    </div>
   );
 }
 

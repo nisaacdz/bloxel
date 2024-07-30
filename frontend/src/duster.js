@@ -20,11 +20,11 @@ class Duster {
   }
 
   sizeX() {
-    return 60;
+    return 30;
   }
 
   sizeY() {
-    return 100;
+    return 60;
   }
 }
 
