@@ -94,7 +94,7 @@ class BloxelBoard:
 
 
 
-color1 = 180, 230, 30
+color1 = 65, 72, 205
 color2 = 255, 255, 255
 
 
@@ -113,22 +113,29 @@ midi = len(trace) // 2
 midj = len(trace[0]) // 2
 max_dist = max(midi, midj)**2
 
+# for i in range(0, len(trace)):
+#     for j in range(0, len(trace[0])):
+#         dist = abs(midi - i)**2 + abs(midj - j)**2
+#         alpha = min(max(0, int(255 - 255 * dist / max_dist)), 255)
+#         red, green, blue = 255, 255, 255
+#         shift = abs(midj - j)
+#         if shift <= 3:
+#             r = shift
+#             w = 3 - shift
+#             red, green, blue = merge_bases(r**2, w**2)
+#         elif shift <= 6:
+#             r = 6 - shift
+#             w = shift - 3
+#             red, green, blue = merge_bases(r**2, w**2)
+#         else:
+#             red, green, blue = color2
+#         trace[i][j] = red, green, blue, alpha
+
 for i in range(0, len(trace)):
     for j in range(0, len(trace[0])):
         dist = abs(midi - i)**2 + abs(midj - j)**2
         alpha = min(max(0, int(255 - 255 * dist / max_dist)), 255)
-        red, green, blue = 255, 255, 255
-        shift = abs(midj - j)
-        if shift <= 3:
-            r = shift
-            w = 3 - shift
-            red, green, blue = merge_bases(r**2, w**2)
-        elif shift <= 6:
-            r = 6 - shift
-            w = shift - 3
-            red, green, blue = merge_bases(r**2, w**2)
-        else:
-            red, green, blue = color2
+        red, green, blue = color1
         trace[i][j] = red, green, blue, alpha
         
 

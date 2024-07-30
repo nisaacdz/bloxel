@@ -1,0 +1,10 @@
+#palette {
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    height: 70px;
+    bottom: 2px;
+    display: flex;
+    align-items: center;
+  }
+  

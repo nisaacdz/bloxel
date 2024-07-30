@@ -1,0 +1,39 @@
+#chalk-tool {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: auto;
+    width: 180px;
+    cursor: pointer;
+    border: 1px solid white;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+
+  #chalk-tool:active {
+    filter: brightness(20%);
+    transition: filter 0.3s ease-in-out;
+  }
+  
+  #color-palette, #design-palette {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
+  
+  .color-palette-item, .chalk-design {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+  }
+  
+  .color-palette-item.active{
+    border: 2px solid white;
+  }
+  
+  .color-palette-item.inactive {
+    border: 2px solid #000;
+  }

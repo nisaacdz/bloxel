@@ -1,16 +1,33 @@
 import { useRef, useState } from "react";
 import "./App.css";
 import Board from "./board/Board";
-import { DefaultChalk, DefaultDuster, ChalkVar1, ChalkVar2 } from "./tools";
+import { DefaultChalk, COLORS, DESIGNS } from "./chalks";
+import { DefaultDuster } from "./duster";
 import Pointer from "./Pointer";
-
-const TOOLS = [DefaultChalk, DefaultDuster, ChalkVar1, ChalkVar2];
+import AppContext from "./AppContext";
+import Palette from "./palette/Palette";
 
 function App() {
   const boardRef = useRef(null);
   const pointerToolRef = useRef(null);
   const activeMouseRef = useRef(null);
-  const [tool_idx, setToolIdx] = useState(0);
+  const [activeTool, setActiveTool] = useState(DefaultChalk);
+  const [colorIdx, setColorIdx] = useState(0);
+  const [designIdx, setDesignIdx] = useState(0);
+
+  const updateColorIdx = (idx) => {
+    DefaultChalk.changeColor(COLORS[idx]);
+    setColorIdx(idx);
+  };
+
+  const updateDesignIdx = (idx) => {
+    DefaultChalk.changeDesign(DESIGNS[idx]);
+    setDesignIdx(idx);
+  };
+
+  const updateActiveTool = (tool) => {
+    setActiveTool(tool);
+  };
 
   const escribe = () => {
     if (boardRef.current != null && activeMouseRef.current != null) {
@@ -21,7 +38,7 @@ function App() {
 
       const boardWidth = board.width();
       const boardHeight = board.height();
-      const tool = TOOLS[tool_idx];
+      const tool = activeTool;
 
       const midi = Math.floor(tool.sizeY() / 2);
       const midj = Math.floor(tool.sizeX() / 2);
@@ -91,32 +108,32 @@ function App() {
     pointerToolRef.current.hide();
   };
 
-  const changeTool = () => {
-    setToolIdx((prevToolIdx) => (prevToolIdx + 1) % TOOLS.length);
-  };
-
-  const toolName = TOOLS[tool_idx].name();
-
   return (
-    <div
-      id="content"
-      draggable="false"
-      onTouchStart={pointerDownHandler}
-      onTouchMove={pointerMoveHandler}
-      onTouchEnd={pointerUpHandler}
-      onTouchCancel={pointerLeaveHandler}
-      onPointerDown={pointerDownHandler}
-      onPointerMove={pointerMoveHandler}
-      onPointerUp={pointerUpHandler}
-      onPointerLeave={pointerLeaveHandler}
-      onPointerCancel={pointerLeaveHandler}
-    >
-      <Board ref={boardRef} />
-      <div id="toggle-button" onClick={changeTool}>
-        {toolName}
+    <AppContext.Provider>
+      <div
+        id="content"
+        draggable="false"
+        onTouchStart={pointerDownHandler}
+        onTouchMove={pointerMoveHandler}
+        onTouchEnd={pointerUpHandler}
+        onTouchCancel={pointerLeaveHandler}
+        onPointerDown={pointerDownHandler}
+        onPointerMove={pointerMoveHandler}
+        onPointerUp={pointerUpHandler}
+        onPointerLeave={pointerLeaveHandler}
+        onPointerCancel={pointerLeaveHandler}
+      >
+        <Board ref={boardRef} />
+        <Palette
+          updateActiveTool={updateActiveTool}
+          colorIdx={colorIdx}
+          designIdx={designIdx}
+          updateColorIdx={updateColorIdx}
+          updateDesignIdx={updateDesignIdx}
+        />
+        <Pointer ref={pointerToolRef} colorIdx={colorIdx} designIdx = {designIdx} activeTool={activeTool}/>
       </div>
-      <Pointer ref={pointerToolRef} background={TOOLS[tool_idx]} />
-    </div>
+    </AppContext.Provider>
   );
 }
 
