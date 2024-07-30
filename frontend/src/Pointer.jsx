@@ -19,25 +19,29 @@ const Pointer = forwardRef(({ colorIdx, designIdx, activeTool }, ref) => {
 
   useEffect(() => {
     const canvas = pointerToolRef.current;
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    const ctx = canvas.getContext("2d");
 
-    const ptrWidth = activeTool.sizeX();
-    const ptrHeight = activeTool.sizeY();
+    const width = activeTool.sizeX();
+    const height = activeTool.sizeY();
 
-    canvas.width = ptrHeight;
-    canvas.height = ptrWidth;
+    canvas.width = height;
+    canvas.height = width;
 
-    for (let x = 0; x < ptrWidth; x++) {
-      for (let y = 0; y < ptrHeight; y++) {
+    const imageData = ctx.createImageData(height, width);
+    const data = imageData.data;
+
+    for (let x = 0; x < width; x++) {
+      for (let y = 0; y < height; y++) {
         const [r, g, b, a] = activeTool.idx_ptr(x, y);
-        const imageData = ctx.getImageData(y, x, 1, 1);
-        imageData.data[0] = r;
-        imageData.data[1] = g;
-        imageData.data[2] = b;
-        imageData.data[3] = a;
-        ctx.putImageData(imageData, y, x);
+        const index = (x * height + y) * 4;
+        data[index] = r;
+        data[index + 1] = g;
+        data[index + 2] = b;
+        data[index + 3] = a;
       }
     }
+
+    ctx.putImageData(imageData, 0, 0);
   }, [colorIdx, designIdx, activeTool]);
 
   return <canvas ref={pointerToolRef} id="pointer-tool" />;

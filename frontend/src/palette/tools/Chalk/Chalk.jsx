@@ -46,29 +46,33 @@ const ChalkDesignPreview = ({ designIdx, colorIdx }) => {
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-
     const chalk = createChalk(DESIGNS[designIdx], COLORS[colorIdx]);
 
     const width = chalk.sizeX();
     const height = chalk.sizeY();
-    canvas.width = width;
-    canvas.height = height;
+    canvas.width = height;
+    canvas.height = width;
+
+    const imageData = ctx.createImageData(height, width);
+    const data = imageData.data;
 
     for (let x = 0; x < width; x++) {
       for (let y = 0; y < height; y++) {
         const [r, g, b, a] = chalk.idx_ptr(x, y);
-        const imageData = ctx.getImageData(y, x, 1, 1);
-        imageData.data[0] = r;
-        imageData.data[1] = g;
-        imageData.data[2] = b;
-        imageData.data[3] = a;
-        ctx.putImageData(imageData, y, x);
+        const index = (x * height + y) * 4;
+        data[index] = r;
+        data[index + 1] = g;
+        data[index + 2] = b;
+        data[index + 3] = a;
       }
     }
+
+    ctx.putImageData(imageData, 0, 0);
   }, [designIdx, colorIdx]);
 
   return <canvas ref={canvasRef} width="20px" height="20px"></canvas>;
 };
+
 
 const DesignPalette = ({
   designIdx,
