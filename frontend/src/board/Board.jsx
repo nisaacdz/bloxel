@@ -40,8 +40,7 @@ const Board = forwardRef(({}, ref) => {
         return [x - rect.left, y - rect.top];
       },
       getPixelColor: (x, y) => {
-        const pixelData = contextRef.current.getImageData(x, y, 1, 1).data;
-        return [pixelData[0], pixelData[1], pixelData[2]];
+        return contextRef.current.getImageData(x, y, 1, 1).data;
       },
       clearAll: () => {
         contextRef.current.fillStyle = "rgb(50, 50, 50)";

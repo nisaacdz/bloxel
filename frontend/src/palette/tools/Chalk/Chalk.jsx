@@ -147,7 +147,7 @@ const ChalkTool = ({
         />
       ) : (
         <div
-          id="chalk-preview"
+          className="chalk-preview chalk-design active"
           onClick={() => {
             setShowDesigns(true);
           }}
