@@ -6,7 +6,7 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "frontend",
+    "productName": "bloxel",
     "version": "0.0.0"
   },
   "tauri": {
