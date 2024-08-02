@@ -1,12 +1,21 @@
 import React from "react";
 
-const ClearTool = ({clearDrawingBoard}) => {
+const ClearTool = ({ clearDrawingBoard }) => {
   const handleClick = (event) => {
-    clearDrawingBoard()
+    clearDrawingBoard();
   };
   return (
-    <div id="clear-tool" title="clear board" onClick={handleClick}>
-      <img className="clear-tool-img" src="./clear.svg" alt="clear-img"></img>
+    <div
+      id="clear-tool"
+      className="simple-btn active"
+      title="clear board"
+      onClick={handleClick}
+    >
+      <img
+        className="clear-tool-img tool-img"
+        src="./clear.svg"
+        alt="clear-img"
+      />
     </div>
   );
 };

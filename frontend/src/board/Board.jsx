@@ -2,14 +2,15 @@ import React, {
   forwardRef,
   useImperativeHandle,
   useRef,
-  useState,
   useEffect,
 } from "react";
 import "./Board.css";
+import { SCREENS } from "../screen";
 
 const Board = forwardRef(({}, ref) => {
   const canvasRef = useRef(null);
   const contextRef = useRef(null);
+  const prevScreenIdx = useRef(null);
 
   useImperativeHandle(
     ref,
@@ -42,6 +43,12 @@ const Board = forwardRef(({}, ref) => {
       getPixelColor: (x, y) => {
         return contextRef.current.getImageData(x, y, 1, 1).data;
       },
+      changePage: (screenIdx) => {
+        changeScreen(screenIdx);
+      },
+      setPage: (screenIdx) => {
+        setScreen(screenIdx);
+      },
       clearAll: () => {
         contextRef.current.fillStyle = "rgb(50, 50, 50)";
         contextRef.current.fillRect(
@@ -55,22 +62,65 @@ const Board = forwardRef(({}, ref) => {
     []
   );
 
-  const handleResize = () => {
+  const setScreen = (screenIdx) => {
     const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    if (screenIdx === SCREENS.length) {
+      SCREENS.push(null);
+    }
+    if (!SCREENS[screenIdx]) {
+      // Create a new default screen
+      ctx.fillStyle = "rgb(50, 50, 50)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      SCREENS[screenIdx] = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    } else {
+      // Load the existing screen
+      ctx.putImageData(SCREENS[screenIdx], 0, 0);
+    }
+
+    contextRef.current = ctx;
+    prevScreenIdx.current = screenIdx;
+  };
+
+  const changeScreen = (screenIdx) => {
+    const canvas = canvasRef.current;
+    if (prevScreenIdx.current !== null) {
+      SCREENS[prevScreenIdx.current] = contextRef.current.getImageData(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+    }
+    setScreen(screenIdx);
+  };
+
+  const onresize = () => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
     ctx.fillStyle = "rgb(50, 50, 50)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.putImageData(data, 0, 0);
     contextRef.current = ctx;
   };
 
   useEffect(() => {
-    handleResize();
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+    ctx.fillStyle = "rgb(50, 50, 50)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    SCREENS.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
 
-    window.addEventListener("resize", handleResize);
+    contextRef.current = ctx;
+
+    window.addEventListener("resize", onresize);
     return () => {
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("resize", onresize);
     };
   }, []);
 

@@ -9,16 +9,26 @@
     gap: 2px;
   }
   
-  #clear-tool {
+  .simple-btn {
     width: 60px;
     height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     border: 1px solid white;
+    background-color: transparent;
+    box-sizing: border-box;
   }
 
-  .clear-tool-img {
+  .simple-btn.active {
+    border-width: 2px;
+  }
+
+  .simple-btn.active:hover {
+    background-color: antiquewhite;
+  }
+
+  .tool-img {
     height: 32px;
     width: 32px;
   }

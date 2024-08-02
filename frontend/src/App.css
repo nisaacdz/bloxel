@@ -4,6 +4,7 @@
   left: 0;
   top: 0;
   bottom: 0;
+  user-select: none;
   background-color: grey;
   overflow: hidden;
 }

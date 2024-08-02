@@ -2,7 +2,6 @@ import { useRef, useState } from "react";
 import "./App.css";
 import Board from "./board/Board";
 import { DefaultChalk, COLORS, DESIGNS } from "./chalks";
-import { DefaultDuster } from "./duster";
 import Pointer from "./Pointer";
 import Palette from "./palette/Palette";
 
@@ -10,6 +9,7 @@ function App() {
   const boardRef = useRef(null);
   const pointerToolRef = useRef(null);
   const activeMouseRef = useRef(null);
+  const [screenIdx, setScreenIdx] = useState(0);
   const [activeTool, setActiveTool] = useState(DefaultChalk);
   const [colorIdx, setColorIdx] = useState(0);
   const [designIdx, setDesignIdx] = useState(0);
@@ -78,6 +78,7 @@ function App() {
       return;
     }
     event.preventDefault();
+    event.stopPropagation();
     pointerToolRef.current.show();
     pointerToolRef.current.reposition(x, y);
     if (
@@ -94,9 +95,22 @@ function App() {
     const y = event.clientY;
     if (event.button == 0 && boardRef.current.within_bounds(x, y)) {
       event.preventDefault();
+      event.stopPropagation();
       activeMouseRef.current = { xPos: x, yPos: y };
       escribe();
     }
+  };
+
+  const changeScreen = (idx) => {
+    // The caller of this function must guarantee that idx is within range [0, SCREENS.length]
+    setScreenIdx(idx);
+    boardRef.current.changePage(idx);
+  };
+
+  const setScreen = (idx) => {
+    // The caller of this function must guarantee that idx is within range [0, SCREENS.length]
+    setScreenIdx(idx);
+    boardRef.current.setPage(idx);
   };
 
   const clearDrawingBoard = () => {
@@ -133,6 +147,9 @@ function App() {
         updateColorIdx={updateColorIdx}
         updateDesignIdx={updateDesignIdx}
         clearDrawingBoard={clearDrawingBoard}
+        screenIdx={screenIdx}
+        changeScreen={changeScreen}
+        setScreen={setScreen}
       />
       <Pointer
         ref={pointerToolRef}
