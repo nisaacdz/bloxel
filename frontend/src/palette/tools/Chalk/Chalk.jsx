@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { createChalk, COLORS, DESIGNS, DefaultChalk } from "../../../chalks";
+import { createChalk, COLORS, DESIGNS, DefaultChalk } from "../../../utils";
 import "./Chalk.css";
 
 const ChalkColorPreview = ({

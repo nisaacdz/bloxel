@@ -1,21 +1,34 @@
-import { forwardRef, useEffect, useRef, useImperativeHandle } from "react";
+import { useEffect, useRef } from "react";
+import './Pointer.css';
 
-const Pointer = forwardRef(({ colorIdx, designIdx, activeTool }, ref) => {
+const Pointer = ({ colorIdx, designIdx, activeTool, withinDrawingZone }) => {
   const pointerToolRef = useRef(null);
 
-  useImperativeHandle(ref, () => ({
-    hide: () => {
-      pointerToolRef.current.style.display = "none";
-    },
-    show: () => {
-      pointerToolRef.current.style.display = "block";
-    },
-    reposition: (posX, posY) => {
-      const x = posX - Math.floor(activeTool.sizeX() / 2);
-      const y = posY - Math.floor(activeTool.sizeY() / 2);
-      pointerToolRef.current.style.transform = `translate(${x}px, ${y}px)`;
-    },
-  }));
+  const hide = () => {
+    pointerToolRef.current.style.display = "none";
+  };
+
+  const show = () => {
+    pointerToolRef.current.style.display = "block";
+  };
+
+  const reposition = (posX, posY) => {
+    const x = posX - Math.floor(activeTool.sizeX() / 2);
+    const y = posY - Math.floor(activeTool.sizeY() / 2);
+    console.log(activeTool.sizeX(), activeTool.sizeY());
+    pointerToolRef.current.style.transform = `translate(${x}px, ${y}px)`;
+  };
+
+  const handleMouseMove = (event) => {
+    const x = event.clientX;
+    const y = event.clientY;
+    if (withinDrawingZone(x, y)) {
+      show();
+      reposition(x, y);
+    } else {
+      hide();
+    }
+  };
 
   useEffect(() => {
     const canvas = pointerToolRef.current;
@@ -44,7 +57,16 @@ const Pointer = forwardRef(({ colorIdx, designIdx, activeTool }, ref) => {
     ctx.putImageData(imageData, 0, 0);
   }, [colorIdx, designIdx, activeTool]);
 
-  return <canvas ref={pointerToolRef} id="pointer-tool" />;
-});
+  useEffect(() => {
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseleave", handleMouseMove);
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseleave", handleMouseMove);
+    };
+  }, []);
+
+  return <canvas ref={pointerToolRef} id="pointer-tool"/>;
+};
 
 export default Pointer;

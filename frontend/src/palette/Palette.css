@@ -1,18 +1,19 @@
 #palette {
+  position: absolute;
   height: 60px;
-  width: min-content;
+  width: 570px;
   display: flex;
   align-items: center;
-  padding: 5px;
-  padding-right: 10px;
   gap: 5px;
+  justify-content: center;
+  background-color: gray;
 }
 
 #palette-collapsed {
+  position: absolute;
   width: 60px;
   height: 32px;
-  top: 300px;
-  background-color: blue;
+  background-color: white;
 }
 
 .palette-resizer {
@@ -30,8 +31,8 @@
 }
 
 .simple-btn {
-  width: 60px;
-  height: 100%;
+  width: 50px;
+  height: 50px;
   display: flex;
   justify-content: center;
   align-items: center;

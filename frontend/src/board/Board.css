@@ -1,14 +1,11 @@
-#boardcontainer {
-  position: absolute;
-  left: 0px;
-  right: 0px;
-  top: 0px;
-  bottom: 0px;
-}
-
 #board {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
   width: 100%;
   height: 100%;
   background-color: rgb(50, 50, 50);
-  box-sizing: border-box;
+  border: none;
 }

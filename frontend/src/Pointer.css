@@ -1,6 +1,6 @@
 #pointer-tool {
-    position: fixed;
+    position: absolute;
     pointer-events: none;
     display: none;
-    z-index: 999;
+    z-index: 99;
 }
