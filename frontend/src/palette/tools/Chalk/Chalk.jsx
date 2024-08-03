@@ -73,7 +73,6 @@ const ChalkDesignPreview = ({ designIdx, colorIdx }) => {
   return <canvas ref={canvasRef} width="20px" height="20px"></canvas>;
 };
 
-
 const DesignPalette = ({
   designIdx,
   updateDesignIdx,
@@ -95,11 +94,7 @@ const DesignPalette = ({
               setShowDesigns(false);
             }}
           >
-            <ChalkDesignPreview
-              key={idx}
-              designIdx={idx}
-              colorIdx={colorIdx}
-            />
+            <ChalkDesignPreview key={idx} designIdx={idx} colorIdx={colorIdx} />
           </div>
         )
       )}
@@ -118,7 +113,7 @@ const ChalkTool = ({
   const [showDesigns, setShowDesigns] = useState(false);
 
   const handleClick = (event) => {
-    updateActiveTool(DefaultChalk);
+    updateActiveTool(0);
   };
 
   return (

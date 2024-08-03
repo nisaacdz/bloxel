@@ -6,8 +6,9 @@ import React, {
 } from "react";
 import "./Board.css";
 import { SCREENS } from "../screen";
+import { MODIFIERS } from "../utils";
 
-const Board = forwardRef(({ activeTool }, ref) => {
+const Board = forwardRef(({ toolIdx }, ref) => {
   const activeMouseRef = useRef(null);
   const canvasRef = useRef(null);
   const contextRef = useRef(null);
@@ -128,7 +129,7 @@ const Board = forwardRef(({ activeTool }, ref) => {
 
       const boardWidth = canvasRef.current.width;
       const boardHeight = canvasRef.current.height;
-      const tool = activeTool;
+      const tool = MODIFIERS[toolIdx];
 
       const midi = Math.floor(tool.sizeX() / 2);
       const midj = Math.floor(tool.sizeY() / 2);

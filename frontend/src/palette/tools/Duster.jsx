@@ -1,9 +1,8 @@
 import React from "react";
-import { DefaultDuster } from "../../duster";
 
 const DusterTool = ({ updateActiveTool }) => {
   const handleClick = () => {
-    updateActiveTool(DefaultDuster);
+    updateActiveTool(1);
   };
   return (
     <div

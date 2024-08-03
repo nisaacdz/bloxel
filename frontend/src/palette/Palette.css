@@ -36,13 +36,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid white;
+  border: 1px solid darkgray;
   background-color: transparent;
   box-sizing: border-box;
 }
 
 .simple-btn.active {
   border-width: 2px;
+  border-color: white;
 }
 
 .simple-btn.active:hover {

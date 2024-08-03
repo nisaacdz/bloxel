@@ -1,5 +1,5 @@
-1. Click on the palette must not be detected outside of it
-2. Pointer tool should display at the correct cursor position
+1. Click on the palette must not be detected outside of it -- checked
+2. Pointer tool should display at the correct cursor position -- checked
 3. Fix bug that causes inconsitency in next, delete, new buttons in the palette
 4. Export button in the palette to export presentations
 5. Import button in the palette to import presentations

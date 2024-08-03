@@ -4,9 +4,6 @@ import Board from "./board/Board";
 import { DefaultChalk, COLORS, DESIGNS } from "./utils";
 import Palette from "./palette/Palette";
 import Pointer from "./Pointer";
-import { DefaultDuster } from "./duster";
-
-const MODIFIERS = [DefaultChalk, DefaultDuster];
 
 function App() {
   const boardRef = useRef(null);
@@ -26,8 +23,8 @@ function App() {
     setDesignIdx(idx);
   };
 
-  const updateActiveTool = (tool) => {
-    setActiveTool(tool);
+  const updateActiveTool = (idx) => {
+    setModifierIdx(idx);
   };
 
   const changeScreen = (idx) => {
@@ -54,7 +51,7 @@ function App() {
 
   return (
     <div id="content">
-      <Board ref={boardRef} activeTool={activeTool} />
+      <Board ref={boardRef} toolIdx={modifierIdx} />
       <Palette
         ref={paletteRef}
         updateActiveTool={updateActiveTool}
@@ -68,7 +65,7 @@ function App() {
         setScreen={setScreen}
       />
       <Pointer
-        activeTool={activeTool}
+        toolIdx={modifierIdx}
         colorIdx={colorIdx}
         designIdx={designIdx}
         withinDrawingZone={withinDrawingZone}
