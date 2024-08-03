@@ -65,7 +65,7 @@ const Pointer = ({ colorIdx, designIdx, toolIdx, withinDrawingZone }) => {
     }
   };
 
-  return <canvas ref={pointerToolRef} id="pointer-tool" />;
+  return <canvas ref={pointerToolRef} id="pointer-tool"/>;
 };
 
 export default Pointer;

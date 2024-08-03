@@ -46,7 +46,7 @@ const Palette = forwardRef(
           const y1 = rect.top;
           const x2 = x1 + rect.width;
           const y2 = y1 + rect.height;
-          
+
           return x >= x1 && y >= y1 && x < x2 && y < y2;
         },
       }),
