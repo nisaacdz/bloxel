@@ -8,23 +8,14 @@ import "./Board.css";
 import { SCREENS } from "../screen";
 import { MODIFIERS } from "../utils";
 
-const Board = forwardRef(({ toolIdx }, ref) => {
+const Board = forwardRef(({ toolIdx, screenIdx }, ref) => {
   const activeMouseRef = useRef(null);
   const canvasRef = useRef(null);
   const contextRef = useRef(null);
   const prevScreenIdx = useRef(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
-    ctx.fillStyle = "rgb(50, 50, 50)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    SCREENS.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
-
-    contextRef.current = ctx;
-
+    changeScreen(screenIdx);
     window.addEventListener("resize", onresize);
     return () => {
       window.removeEventListener("resize", onresize);
@@ -34,11 +25,11 @@ const Board = forwardRef(({ toolIdx }, ref) => {
   useImperativeHandle(
     ref,
     () => ({
-      changePage: (screenIdx) => {
-        changeScreen(screenIdx);
+      changePage: (idx) => {
+        changeScreen(idx);
       },
-      setPage: (screenIdx) => {
-        setScreen(screenIdx);
+      setPage: (idx) => {
+        setScreen(idx);
       },
       clearAll: () => {
         contextRef.current.fillStyle = "rgb(50, 50, 50)";
@@ -80,6 +71,8 @@ const Board = forwardRef(({ toolIdx }, ref) => {
 
   const setScreen = (screenIdx) => {
     const canvas = canvasRef.current;
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
     if (screenIdx === SCREENS.length) {
       SCREENS.push(null);

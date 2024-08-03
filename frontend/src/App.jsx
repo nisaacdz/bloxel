@@ -51,7 +51,7 @@ function App() {
 
   return (
     <div id="content">
-      <Board ref={boardRef} toolIdx={modifierIdx} />
+      <Board ref={boardRef} toolIdx={modifierIdx} screenIdx={screenIdx} />
       <Palette
         ref={paletteRef}
         updateActiveTool={updateActiveTool}
