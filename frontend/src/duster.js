@@ -12,18 +12,18 @@ class Duster {
   }
 
   idx_ptr(x, y) {
-    if (x < 2 || x >= this.sizeX() - 2 || y < 2 || y >= this.sizeY() - 2) {
+    if (x < 2 || x >= this.sizeY() - 2 || y < 2 || y >= this.sizeX() - 2) {
       return complement(this.idx(x, y));
     } else {
       return this.idx(x, y);
     }
   }
 
-  sizeX() {
+  sizeY() {
     return 30;
   }
 
-  sizeY() {
+  sizeX() {
     return 60;
   }
 }

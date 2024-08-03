@@ -1,0 +1,7 @@
+1. Click on the palette must not be detected outside of it
+2. Pointer tool should display at the correct cursor position
+3. Fix bug that causes inconsitency in next, delete, new buttons in the palette
+4. Export button in the palette to export presentations
+5. Import button in the palette to import presentations
+6. Fix line breakages when drawing fast
+7. Fix touch moving screen instead of drawing

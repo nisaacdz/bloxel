@@ -11,8 +11,8 @@ const Pointer = forwardRef(({ colorIdx, designIdx, activeTool }, ref) => {
       pointerToolRef.current.style.display = "block";
     },
     reposition: (posX, posY) => {
-      const x = posX - Math.floor(activeTool.sizeY() / 2);
-      const y = posY - Math.floor(activeTool.sizeX() / 2);
+      const x = posX - Math.floor(activeTool.sizeX() / 2);
+      const y = posY - Math.floor(activeTool.sizeY() / 2);
       pointerToolRef.current.style.transform = `translate(${x}px, ${y}px)`;
     },
   }));
@@ -21,8 +21,8 @@ const Pointer = forwardRef(({ colorIdx, designIdx, activeTool }, ref) => {
     const canvas = pointerToolRef.current;
     const ctx = canvas.getContext("2d");
 
-    const width = activeTool.sizeX();
-    const height = activeTool.sizeY();
+    const width = activeTool.sizeY();
+    const height = activeTool.sizeX();
 
     canvas.width = height;
     canvas.height = width;

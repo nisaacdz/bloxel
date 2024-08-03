@@ -39,11 +39,11 @@ function App() {
       const boardHeight = board.height();
       const tool = activeTool;
 
-      const midi = Math.floor(tool.sizeY() / 2);
-      const midj = Math.floor(tool.sizeX() / 2);
+      const midi = Math.floor(tool.sizeX() / 2);
+      const midj = Math.floor(tool.sizeY() / 2);
 
-      for (let tj = 0; tj < tool.sizeX(); tj++) {
-        for (let ti = 0; ti < tool.sizeY(); ti++) {
+      for (let tj = 0; tj < tool.sizeY(); tj++) {
+        for (let ti = 0; ti < tool.sizeX(); ti++) {
           const [r1, g1, b1, a] = tool.idx(tj, ti);
 
           const ni = mouseX + ti - midi;
@@ -77,7 +77,6 @@ function App() {
       pointerToolRef.current.hide();
       return;
     }
-    event.preventDefault();
     event.stopPropagation();
     pointerToolRef.current.show();
     pointerToolRef.current.reposition(x, y);
@@ -94,7 +93,6 @@ function App() {
     const x = event.clientX;
     const y = event.clientY;
     if (event.button == 0 && boardRef.current.within_bounds(x, y)) {
-      event.preventDefault();
       event.stopPropagation();
       activeMouseRef.current = { xPos: x, yPos: y };
       escribe();

@@ -48,8 +48,8 @@ const ChalkDesignPreview = ({ designIdx, colorIdx }) => {
     const ctx = canvas.getContext("2d");
     const chalk = createChalk(DESIGNS[designIdx], COLORS[colorIdx]);
 
-    const width = chalk.sizeX();
-    const height = chalk.sizeY();
+    const width = chalk.sizeY();
+    const height = chalk.sizeX();
     canvas.width = height;
     canvas.height = width;
 

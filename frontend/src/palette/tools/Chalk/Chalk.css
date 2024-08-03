@@ -3,7 +3,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: auto;
+    height: 54px;
     width: 180px;
     cursor: pointer;
     border: 1px solid white;
@@ -13,7 +13,7 @@
   }
 
   #chalk-tool:active {
-    filter: brightness(20%);
+    filter: brightness(300%);
     transition: filter 0.3s ease-in-out;
   }
   

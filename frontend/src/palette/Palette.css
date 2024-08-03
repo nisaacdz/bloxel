@@ -1,34 +1,54 @@
 #palette {
-    position: absolute;
-    left: 20px;
-    right: 20px;
-    height: 70px;
-    bottom: 2px;
-    display: flex;
-    align-items: center;
-    gap: 2px;
-  }
-  
-  .simple-btn {
-    width: 60px;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 1px solid white;
-    background-color: transparent;
-    box-sizing: border-box;
-  }
+  height: 60px;
+  width: min-content;
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  padding-right: 10px;
+  gap: 5px;
+}
 
-  .simple-btn.active {
-    border-width: 2px;
-  }
+#palette-collapsed {
+  width: 60px;
+  height: 32px;
+  top: 300px;
+  background-color: blue;
+}
 
-  .simple-btn.active:hover {
-    background-color: antiquewhite;
-  }
+.palette-resizer {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+}
 
-  .tool-img {
-    height: 32px;
-    width: 32px;
-  }
+.palette-resizer img {
+  width: 32px;
+  height: 32px;
+}
+
+.simple-btn {
+  width: 60px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid white;
+  background-color: transparent;
+  box-sizing: border-box;
+}
+
+.simple-btn.active {
+  border-width: 2px;
+}
+
+.simple-btn.active:hover {
+  background-color: antiquewhite;
+}
+
+.tool-img {
+  height: 32px;
+  width: 32px;
+}

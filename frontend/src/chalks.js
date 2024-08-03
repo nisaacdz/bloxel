@@ -578,7 +578,7 @@ class Chalk {
 }
 
 export function createChalk(design, color) {
-  const chalk =  new Chalk(design, DEFAULT_CHALK_COLOR);
+  const chalk = new Chalk(design, DEFAULT_CHALK_COLOR);
   chalk.changeColor(color);
   return chalk;
 }
