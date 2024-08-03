@@ -19,6 +19,7 @@ More tools like undo, redo, next page, drag page, etc. will be coming soon.
 
 ![Screenshot 1](./.screenshots/shot1.png)
 ![Screenshot 2](./.screenshots/record1.gif)
+![Screenshot 3](./.screenshots/record2.gif)
 
 ## Installation
 
