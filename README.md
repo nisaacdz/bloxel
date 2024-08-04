@@ -4,16 +4,11 @@ Bloxel is a digital chalkboard application built with Tauri and React. It is des
 
 ## Features
 
-### Design Chalks
-Bloxel includes the concept of "design chalks," allowing users to create custom chalks with special cross-sectional colors.
+- Design Chalks
+- Straight Line Correction
+- Export to PDF
+- Import a .bloxel file
 
-### Straight Line Correction
-Algorithms to correct straight lines, ensuring your drawings and notes are clean and precise.
-To detect straight lines, we points with equal intervals are sampled along a line, then the standard diviation of the gradients between successive points are calculated. If this standard deviation falls within a treshold, it is considered a straight line with gradient equal to the average gradient and passes through the centroid of sampled points. 
-
-### Export to PDF and PPT
-Currently incorporating libraries for conversion of canvas to pdf, png, jpg, ppt, etc.
-More tools like undo, redo, next page, drag page, etc. will be coming soon.
 
 ## Screenshots
 
