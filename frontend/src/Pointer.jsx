@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import "./Pointer.css";
 import { MODIFIERS } from "./utils";
 
-const Pointer = ({ colorIdx, designIdx, toolIdx, withinDrawingZone }) => {
+const Pointer = ({ colorIdx, designIdx, toolIdx, backgroundIdx, withinDrawingZone }) => {
   const pointerToolRef = useRef(null);
   useEffect(() => {
     const canvas = pointerToolRef.current;
@@ -29,7 +29,7 @@ const Pointer = ({ colorIdx, designIdx, toolIdx, withinDrawingZone }) => {
     }
 
     ctx.putImageData(imageData, 0, 0);
-  }, [colorIdx, designIdx, toolIdx]);
+  }, [colorIdx, designIdx, toolIdx, backgroundIdx]);
 
   useEffect(() => {
     document.addEventListener("mousemove", handleMouseMove);

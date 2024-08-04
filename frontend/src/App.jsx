@@ -92,6 +92,7 @@ function App() {
         toolIdx={modifierIdx}
         colorIdx={colorIdx}
         designIdx={designIdx}
+        backgroundIdx={backgroundIdx}
         withinDrawingZone={withinDrawingZone}
       />
     </div>
