@@ -5,32 +5,37 @@ import React, {
   useState,
 } from "react";
 import "./Palette.css";
-import ChalkTool from "./tools/Chalk/Chalk";
+import ChalkTool from "./tools/large/Chalk";
 import DusterTool from "./tools/Duster";
 import ClearTool from "./tools/Clear";
 import NextTool from "./tools/Next";
 import PrevTool from "./tools/Prev";
 import AddTool from "./tools/Add";
 import DelTool from "./tools/Del";
+import Background from "./tools/large/Background";
 
 const Palette = forwardRef(
   (
     {
-      colorIdx,
-      updateColorIdx,
-      designIdx,
-      updateDesignIdx,
       updateActiveTool,
+      backgroundIdx,
+      updateBackgroundIdx,
+      colorIdx,
+      designIdx,
+      updateColorIdx,
+      updateDesignIdx,
       clearDrawingBoard,
-      screenIdx,
-      changeScreen,
-      setScreen,
+      screenData,
+      delPage,
+      addPage,
+      nextPage,
+      prevPage,
     },
     ref
   ) => {
     const [collapsed, setCollapsed] = useState(false);
     const container = useRef(null);
-    const size = useRef({ width: 570, height: 60 });
+    const size = useRef({ width: 630, height: 44 });
     const position = useRef({
       x: (window.innerWidth - size.current.width) / 2,
       y: window.innerHeight - size.current.height - 5,
@@ -107,7 +112,7 @@ const Palette = forwardRef(
 
     const onExpand = (event) => {
       event.stopPropagation();
-      size.current = { width: 570, height: 60 };
+      size.current = { width: 630, height: 44 };
       reposition();
       setCollapsed(false);
     };
@@ -144,6 +149,10 @@ const Palette = forwardRef(
           transform: `translate(${position.current.x}px, ${position.current.y}px)`,
         }}
       >
+        <Background
+          backgroundIdx={backgroundIdx}
+          updateBackgroundIdx={updateBackgroundIdx}
+        />
         <ChalkTool
           colorIdx={colorIdx}
           updateColorIdx={updateColorIdx}
@@ -153,10 +162,10 @@ const Palette = forwardRef(
         />
         <DusterTool updateActiveTool={updateActiveTool} />
         <ClearTool clearDrawingBoard={clearDrawingBoard} />
-        <PrevTool changeScreen={changeScreen} screenIdx={screenIdx} />
-        <NextTool changeScreen={changeScreen} screenIdx={screenIdx} />
-        <AddTool changeScreen={changeScreen} />
-        <DelTool screenIdx={screenIdx} setScreen={setScreen} />
+        <PrevTool prevPage={prevPage} screenData={screenData} />
+        <NextTool nextPage={nextPage} screenData={screenData} />
+        <AddTool addPage={addPage} screenData={screenData} />
+        <DelTool delPage={delPage} screenData={screenData} />
         <button className="palette-resizer" onClick={onCollapse}>
           <img src="./min.svg" alt="minimize palette" />
         </button>

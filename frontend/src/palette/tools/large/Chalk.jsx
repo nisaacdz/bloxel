@@ -1,5 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
-import { createChalk, COLORS, DESIGNS, DefaultChalk } from "../../../utils";
+import {
+  createChalk,
+  COLORS,
+  DESIGNS,
+  DefaultChalk,
+  complement,
+} from "../../../utils";
 import "./Chalk.css";
 
 const ChalkColorPreview = ({
@@ -8,12 +14,18 @@ const ChalkColorPreview = ({
   setShowColors,
   active,
 }) => {
-  const background = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
-  const classnames = `color-palette-item ${active ? "active" : "inactive"}`;
+  const borderColor = complement(color);
+  const colorValue = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+  const classnames = `chalk-color ${active ? "active" : "inactive"}`;
   return (
     <div
       className={classnames}
-      style={{ backgroundColor: background }}
+      style={{
+        backgroundColor: colorValue,
+        border: active
+          ? `2px solid rgb(${borderColor[0]}, ${borderColor[1]}, ${borderColor[2]})`
+          : "none",
+      }}
       onClick={() => {
         updateColorIdx();
         setShowColors();
@@ -40,7 +52,7 @@ const ColorPalette = ({ colorIdx, updateColorIdx, setShowColors }) => {
   );
 };
 
-const ChalkDesignPreview = ({ designIdx, colorIdx }) => {
+const ChalkDesignPreview = ({ active, designIdx, colorIdx, handleClick }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -70,7 +82,22 @@ const ChalkDesignPreview = ({ designIdx, colorIdx }) => {
     ctx.putImageData(imageData, 0, 0);
   }, [designIdx, colorIdx]);
 
-  return <canvas ref={canvasRef} width="20px" height="20px"></canvas>;
+  const borderColor = complement(COLORS[colorIdx]);
+
+  return (
+    <canvas
+      className={`chalk-design ${active ? "active" : "inactive"}`}
+      ref={canvasRef}
+      width="20px"
+      height="20px"
+      style={{
+        border: active
+          ? `2px solid rgb(${borderColor[0]}, ${borderColor[1]}, ${borderColor[2]})`
+          : "none",
+      }}
+      onClick={handleClick}
+    ></canvas>
+  );
 };
 
 const DesignPalette = ({
@@ -81,23 +108,19 @@ const DesignPalette = ({
 }) => {
   return (
     <div id="design-palette">
-      {Array.from({ length: DESIGNS.length }, (value, index) => index).map(
-        (idx) => (
-          <div
-            key={idx}
-            className={`chalk-design ${
-              idx === designIdx ? "active" : "inactive"
-            }`}
-            onClick={(event) => {
-              event.stopPropagation();
-              updateDesignIdx(idx);
-              setShowDesigns(false);
-            }}
-          >
-            <ChalkDesignPreview key={idx} designIdx={idx} colorIdx={colorIdx} />
-          </div>
-        )
-      )}
+      {Array.from({ length: DESIGNS.length }, (value, i) => i).map((idx) => (
+        <ChalkDesignPreview
+          key={idx}
+          designIdx={idx}
+          colorIdx={colorIdx}
+          active={idx == designIdx}
+          handleClick={(event) => {
+            event.stopPropagation();
+            updateDesignIdx(idx);
+            setShowDesigns(false);
+          }}
+        />
+      ))}
     </div>
   );
 };
@@ -117,7 +140,7 @@ const ChalkTool = ({
   };
 
   return (
-    <div id="chalk-tool" onClick={handleClick}>
+    <div id="chalk-tool" onClick={handleClick} title="chalks">
       {showColors ? (
         <ColorPalette
           colorIdx={colorIdx}
@@ -126,7 +149,6 @@ const ChalkTool = ({
         />
       ) : (
         <ChalkColorPreview
-          key={colorIdx}
           color={COLORS[colorIdx]}
           active={true}
           updateColorIdx={() => {}}
@@ -141,18 +163,14 @@ const ChalkTool = ({
           colorIdx={colorIdx}
         />
       ) : (
-        <div
-          className="chalk-preview chalk-design active"
-          onClick={() => {
+        <ChalkDesignPreview
+          active={true}
+          designIdx={designIdx}
+          colorIdx={colorIdx}
+          handleClick={() => {
             setShowDesigns(true);
           }}
-        >
-          <ChalkDesignPreview
-            key={designIdx}
-            designIdx={designIdx}
-            colorIdx={colorIdx}
-          />
-        </div>
+        />
       )}
     </div>
   );

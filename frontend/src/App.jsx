@@ -1,17 +1,29 @@
 import { useRef, useState } from "react";
 import "./App.css";
 import Board from "./board/Board";
-import { DefaultChalk, COLORS, DESIGNS } from "./utils";
+import {
+  DefaultChalk,
+  COLORS,
+  DESIGNS,
+  BACKGROUNDS,
+  MODIFIERS,
+} from "./utils";
 import Palette from "./palette/Palette";
 import Pointer from "./Pointer";
 
 function App() {
   const boardRef = useRef(null);
   const paletteRef = useRef(null);
-  const [screenIdx, setScreenIdx] = useState(0);
+  const [screenData, setScreenData] = useState({ idx: 0, size: 1 });
   const [modifierIdx, setModifierIdx] = useState(0);
   const [colorIdx, setColorIdx] = useState(0);
+  const [backgroundIdx, setBackgroundIdx] = useState(0);
   const [designIdx, setDesignIdx] = useState(0);
+
+  const updateBackgroundIdx = (idx) => {
+    MODIFIERS[1].changeBackground(BACKGROUNDS[idx]);
+    setBackgroundIdx(idx);
+  };
 
   const updateColorIdx = (idx) => {
     DefaultChalk.changeColor(COLORS[idx]);
@@ -27,21 +39,25 @@ function App() {
     setModifierIdx(idx);
   };
 
-  const changeScreen = (idx) => {
-    // The caller of this function must guarantee that idx is within range [0, SCREENS.length]
-    setScreenIdx(idx);
-    boardRef.current.changePage(idx);
-  };
-
-  const setScreen = (idx) => {
-    // The caller of this function must guarantee that idx is within range [0, SCREENS.length]
-    setScreenIdx(idx);
-    boardRef.current.setPage(idx);
-  };
-
   const clearDrawingBoard = () => {
-    boardRef.current.clearAll();
+    boardRef.current.clearBoard();
   };
+
+  const delPage = () => {
+    setScreenData(boardRef.current.delPage())
+  }
+
+  const addPage = () => {
+    setScreenData(boardRef.current.addPage())
+  }
+
+  const prevPage = () => {
+    setScreenData(boardRef.current.prevPage())
+  }
+
+  const nextPage = () => {
+    setScreenData(boardRef.current.nextPage())
+  }
 
   const withinDrawingZone = (x, y) => {
     return (
@@ -51,18 +67,26 @@ function App() {
 
   return (
     <div id="content">
-      <Board ref={boardRef} toolIdx={modifierIdx} screenIdx={screenIdx} />
+      <Board
+        ref={boardRef}
+        toolIdx={modifierIdx}
+        backgroundIdx={backgroundIdx}
+      />
       <Palette
         ref={paletteRef}
         updateActiveTool={updateActiveTool}
+        backgroundIdx={backgroundIdx}
+        updateBackgroundIdx={updateBackgroundIdx}
         colorIdx={colorIdx}
         designIdx={designIdx}
         updateColorIdx={updateColorIdx}
         updateDesignIdx={updateDesignIdx}
         clearDrawingBoard={clearDrawingBoard}
-        screenIdx={screenIdx}
-        changeScreen={changeScreen}
-        setScreen={setScreen}
+        screenData={screenData}
+        delPage={delPage}
+        addPage={addPage}
+        nextPage={nextPage}
+        prevPage={prevPage}
       />
       <Pointer
         toolIdx={modifierIdx}

@@ -1,11 +1,10 @@
 import React from "react";
-import { SCREENS } from "../../screen";
 
-const NextTool = ({ screenIdx, changeScreen }) => {
-  const active = screenIdx + 1 < SCREENS.length;
+const NextTool = ({ nextPage, screenData }) => {
+  const active = screenData.idx + 1 < screenData.size;
   const handleClick = () => {
     if (active) {
-      changeScreen(screenIdx + 1);
+      nextPage()
     }
   };
 

@@ -1,17 +1,17 @@
 #palette {
   position: absolute;
-  height: 60px;
-  width: 570px;
+  height: 44px;
+  width: 630px;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 2px;
   justify-content: center;
-  background-color: gray;
+  background-color: rgb(90, 95, 100);
 }
 
 #palette-collapsed {
   position: absolute;
-  width: 60px;
+  width: 44px;
   height: 32px;
   background-color: white;
 }
@@ -26,13 +26,13 @@
 }
 
 .palette-resizer img {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
 }
 
 .simple-btn {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 36px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -51,6 +51,6 @@
 }
 
 .tool-img {
-  height: 32px;
-  width: 32px;
+  width: 24px;
+  height: 24px;
 }

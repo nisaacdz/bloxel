@@ -1,0 +1,22 @@
+#background {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 35px;
+    width: 150px;
+    border: 1px solid white;
+    gap: 5px;
+}
+
+.background-preview {
+    width: 20px;
+    height: 20px;
+}
+
+.background-preview.active {
+    border: 2px solid white;
+}
+
+.background-preview.inactive {
+    border: 2px solid black;
+}

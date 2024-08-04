@@ -1,10 +1,10 @@
 import React from "react";
 
-const PrevTool = ({ screenIdx, changeScreen }) => {
-  const active = screenIdx > 0;
+const PrevTool = ({ prevPage, screenData }) => {
+  const active = screenData.idx > 0;
   const handleClick = () => {
     if (active) {
-      changeScreen(screenIdx - 1);
+      prevPage()
     }
   };
 

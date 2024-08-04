@@ -1,3 +1,4 @@
+const DEFAULT_BACKGROUND = [50, 50, 50, 255];
 const DEFAULT_CHALK_COLOR = [65, 72, 205];
 const DEFAULT_CHALK_TRACE = [
   [
@@ -592,12 +593,26 @@ export const COLORS = [
   [165, 75, 165],
   [255, 127, 50],
   [255, 255, 255],
+  [0, 0, 0],
 ];
+
+export const BACKGROUNDS = [
+  [50, 50, 50, 255],
+  [255, 255, 255, 255],
+  [90, 190, 120, 255],
+  [60, 60, 190, 255],
+  [190, 120, 120, 255],
+];
+
 export const DESIGNS = [DEFAULT_CHALK_TRACE, SOLID_CHALK_TRACE];
 
 class Duster {
   constructor(background) {
     this.background = background;
+  }
+
+  changeBackground(newbackground) {
+    this.background = newbackground;
   }
 
   name() {
@@ -625,11 +640,11 @@ class Duster {
   }
 }
 
-function complement(color) {
+export function complement(color) {
   const [r, g, b, a] = color;
   return [255 - r, 255 - g, 255 - b, a];
 }
 
-export const DefaultDuster = new Duster([50, 50, 50, 255]);
+export const DefaultDuster = new Duster(DEFAULT_BACKGROUND);
 
 export const MODIFIERS = [DefaultChalk, DefaultDuster];

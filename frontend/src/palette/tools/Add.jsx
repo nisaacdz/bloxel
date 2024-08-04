@@ -1,9 +1,8 @@
 import React from "react";
-import { SCREENS } from "../../screen";
 
-const AddTool = ({ changeScreen }) => {
+const AddTool = ({ addPage, screenData }) => {
   const handleClick = () => {
-    changeScreen(SCREENS.length);
+    addPage();
   };
 
   return (

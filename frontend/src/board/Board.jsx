@@ -1,44 +1,98 @@
 import React, {
   forwardRef,
+  useEffect,
   useImperativeHandle,
   useRef,
-  useEffect,
 } from "react";
 import "./Board.css";
-import { SCREENS } from "../screen";
-import { MODIFIERS } from "../utils";
+import { BACKGROUNDS, MODIFIERS } from "../utils";
 
-const Board = forwardRef(({ toolIdx, screenIdx }, ref) => {
+const SCREENS = [null];
+
+function escribe(activeMouseRef, contextRef, toolIdx) {
+  if (activeMouseRef.current != null) {
+    const { xPos: mouseX, yPos: mouseY } = activeMouseRef.current;
+
+    const boardWidth = contextRef.current.canvas.width;
+    const boardHeight = contextRef.current.canvas.height;
+    const tool = MODIFIERS[toolIdx];
+
+    const midi = Math.floor(tool.sizeX() / 2);
+    const midj = Math.floor(tool.sizeY() / 2);
+
+    for (let tj = 0; tj < tool.sizeY(); tj++) {
+      for (let ti = 0; ti < tool.sizeX(); ti++) {
+        const [r1, g1, b1, a] = tool.idx(tj, ti);
+
+        const ni = mouseX + ti - midi;
+        const nj = mouseY + tj - midj;
+
+        if (ni >= 0 && ni < boardWidth && nj >= 0 && nj < boardHeight) {
+          const [r2, g2, b2] = contextRef.current.getImageData(
+            ni,
+            nj,
+            1,
+            1
+          ).data;
+
+          const f1 = a / 255;
+          const f2 = 1.0 - f1;
+
+          const r = f1 * r1 + f2 * r2;
+          const g = f1 * g1 + f2 * g2;
+          const b = f1 * b1 + f2 * b2;
+
+          const imageData = contextRef.current.getImageData(ni, nj, 1, 1);
+          const pixel = imageData.data;
+          pixel[0] = Math.floor(r);
+          pixel[1] = Math.floor(g);
+          pixel[2] = Math.floor(b);
+          contextRef.current.putImageData(imageData, ni, nj);
+        }
+      }
+    }
+  }
+}
+
+const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
   const activeMouseRef = useRef(null);
   const canvasRef = useRef(null);
   const contextRef = useRef(null);
-  const prevScreenIdx = useRef(null);
+  const screenIdx = useRef(0);
 
   useEffect(() => {
-    changeScreen(screenIdx);
+    onstart();
     window.addEventListener("resize", onresize);
     return () => {
       window.removeEventListener("resize", onresize);
     };
-  }, []);
+  }, [backgroundIdx]);
 
   useImperativeHandle(
     ref,
     () => ({
-      changePage: (idx) => {
-        changeScreen(idx);
+      clearBoard: () => {
+        clearCanvas();
       },
-      setPage: (idx) => {
-        setScreen(idx);
+      delPage: () => {
+        SCREENS.splice(screenIdx.current, 1);
+        if (SCREENS.length == 0) SCREENS.push(null);
+        const newIdx = Math.max(0, screenIdx.current - 1);
+        loadScreenAt(newIdx);
+        return { idx: newIdx, size: SCREENS.length };
       },
-      clearAll: () => {
-        contextRef.current.fillStyle = "rgb(50, 50, 50)";
-        contextRef.current.fillRect(
-          0,
-          0,
-          canvasRef.current.width,
-          canvasRef.current.height
-        );
+      addPage: () => {
+        SCREENS.splice(screenIdx.current + 1, 0, null);
+        slidePage(screenIdx.current + 1);
+        return { idx: screenIdx.current, size: SCREENS.length };
+      },
+      prevPage: () => {
+        slidePage(screenIdx.current - 1);
+        return { idx: screenIdx.current, size: SCREENS.length };
+      },
+      nextPage: () => {
+        slidePage(screenIdx.current + 1);
+        return { idx: screenIdx.current, size: SCREENS.length };
       },
       withinRect: (x, y) => {
         const rect = canvasRef.current.getBoundingClientRect();
@@ -50,109 +104,58 @@ const Board = forwardRef(({ toolIdx, screenIdx }, ref) => {
         return x >= x1 && y >= y1 && x < x2 && y < y2;
       },
     }),
-    []
+    [backgroundIdx]
   );
 
-  const setPixelColor = (x, y, color) => {
-    const imageData = contextRef.current.getImageData(x, y, 1, 1);
-    const pixel = imageData.data;
-    pixel[0] = color[0];
-    pixel[1] = color[1];
-    pixel[2] = color[2];
-    contextRef.current.putImageData(imageData, x, y);
+  const loadScreenAt = (idx) => {
+    if (SCREENS[idx]) {
+      contextRef.current.putImageData(SCREENS[idx], 0, 0);
+    } else {
+      clearCanvas();
+    }
+    screenIdx.current = idx;
   };
 
-  // const width = () => canvasRef.current.width;
-  // const height = () => canvasRef.current.height,
-
-  const getPixelColor = (x, y) => {
-    return contextRef.current.getImageData(x, y, 1, 1).data;
+  const slidePage = (idx) => {
+    const canvas = canvasRef.current;
+    SCREENS[screenIdx.current] = contextRef.current.getImageData(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+    loadScreenAt(idx);
   };
 
-  const setScreen = (screenIdx) => {
+  const clearCanvas = () => {
+    const background = BACKGROUNDS[backgroundIdx];
+    contextRef.current.fillStyle = `rgb(${background[0]}, ${background[1]}, ${background[2]})`;
+    contextRef.current.fillRect(
+      0,
+      0,
+      canvasRef.current.width,
+      canvasRef.current.height
+    );
+  };
+
+  const onstart = () => {
     const canvas = canvasRef.current;
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
-    if (screenIdx === SCREENS.length) {
-      SCREENS.push(null);
-    }
-    if (!SCREENS[screenIdx]) {
-      // Create a new default screen
-      ctx.fillStyle = "rgb(50, 50, 50)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      SCREENS[screenIdx] = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    } else {
-      // Load the existing screen
-      ctx.putImageData(SCREENS[screenIdx], 0, 0);
-    }
-
     contextRef.current = ctx;
-    prevScreenIdx.current = screenIdx;
-  };
-
-  const changeScreen = (screenIdx) => {
-    const canvas = canvasRef.current;
-    if (prevScreenIdx.current !== null) {
-      SCREENS[prevScreenIdx.current] = contextRef.current.getImageData(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-      );
-    }
-    setScreen(screenIdx);
-  };
+    clearCanvas();
+  }
 
   const onresize = () => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
-    const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = contextRef.current.getImageData(0, 0, canvas.width, canvas.height);
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
-    ctx.fillStyle = "rgb(50, 50, 50)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.putImageData(data, 0, 0);
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
     contextRef.current = ctx;
-  };
-
-  const escribe = () => {
-    if (activeMouseRef.current != null) {
-      const { xPos: mouseX, yPos: mouseY } = activeMouseRef.current;
-
-      const boardWidth = canvasRef.current.width;
-      const boardHeight = canvasRef.current.height;
-      const tool = MODIFIERS[toolIdx];
-
-      const midi = Math.floor(tool.sizeX() / 2);
-      const midj = Math.floor(tool.sizeY() / 2);
-
-      for (let tj = 0; tj < tool.sizeY(); tj++) {
-        for (let ti = 0; ti < tool.sizeX(); ti++) {
-          const [r1, g1, b1, a] = tool.idx(tj, ti);
-
-          const ni = mouseX + ti - midi;
-          const nj = mouseY + tj - midj;
-
-          if (ni >= 0 && ni < boardWidth && nj >= 0 && nj < boardHeight) {
-            const [r2, g2, b2] = getPixelColor(ni, nj);
-
-            const f1 = a / 255;
-            const f2 = 1.0 - f1;
-
-            const r = f1 * r1 + f2 * r2;
-            const g = f1 * g1 + f2 * g2;
-            const b = f1 * b1 + f2 * b2;
-
-            setPixelColor(ni, nj, [
-              Math.floor(r),
-              Math.floor(g),
-              Math.floor(b),
-            ]);
-          }
-        }
-      }
-    }
+    clearCanvas();
+    ctx.putImageData(data, 0, 0);
   };
 
   const pointerDownHandler = (event) => {
@@ -161,7 +164,7 @@ const Board = forwardRef(({ toolIdx, screenIdx }, ref) => {
     if (event.button == 0) {
       event.stopPropagation();
       activeMouseRef.current = { xPos: x, yPos: y };
-      escribe();
+      escribe(activeMouseRef, contextRef, toolIdx);
     }
   };
 
@@ -171,7 +174,7 @@ const Board = forwardRef(({ toolIdx, screenIdx }, ref) => {
     const y = event.clientY;
     if (activeMouseRef.current != null) {
       activeMouseRef.current = { xPos: x, yPos: y };
-      escribe();
+      escribe(activeMouseRef, contextRef, toolIdx);
     }
   };
 
