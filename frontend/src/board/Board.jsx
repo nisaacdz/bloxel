@@ -11,39 +11,31 @@ import jsPDF from "jspdf";
 const SCREENS = [null];
 
 function escribe(mouseX, mouseY, contextRef) {
-  const boardWidth = contextRef.current.canvas.width;
-  const boardHeight = contextRef.current.canvas.height;
   const tool = DefaultChalk;
 
-  const midi = Math.floor(tool.sizeX() / 2);
-  const midj = Math.floor(tool.sizeY() / 2);
+  const n = tool.sizeX();
+  const m = tool.sizeY();
+  const x = mouseX - Math.floor(n / 2);
+  const y = mouseY - Math.floor(m / 2);
 
-  for (let tj = 0; tj < tool.sizeY(); tj++) {
-    for (let ti = 0; ti < tool.sizeX(); ti++) {
-      const [r1, g1, b1, a] = tool.idx(tj, ti);
+  const imageData = contextRef.current.getImageData(x, y, m, n);
+  const data = imageData.data;
 
-      const ni = mouseX + ti - midi;
-      const nj = mouseY + tj - midj;
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < m; j++) {
+      const [r1, g1, b1, a] = tool.idx(i, j);
+      const idx = (i * m + j) * 4;
 
-      if (ni >= 0 && ni < boardWidth && nj >= 0 && nj < boardHeight) {
-        const [r2, g2, b2] = contextRef.current.getImageData(ni, nj, 1, 1).data;
+      const f1 = a / 255;
+      const f2 = 1.0 - f1;
 
-        const f1 = a / 255;
-        const f2 = 1.0 - f1;
-
-        const r = f1 * r1 + f2 * r2;
-        const g = f1 * g1 + f2 * g2;
-        const b = f1 * b1 + f2 * b2;
-
-        const imageData = contextRef.current.getImageData(ni, nj, 1, 1);
-        const pixel = imageData.data;
-        pixel[0] = Math.floor(r);
-        pixel[1] = Math.floor(g);
-        pixel[2] = Math.floor(b);
-        contextRef.current.putImageData(imageData, ni, nj);
-      }
+      data[idx] = Math.floor(f1 * r1 + f2 * data[idx]);
+      data[idx + 1] = Math.floor(f1 * g1 + f2 * data[idx + 1]);
+      data[idx + 2] = Math.floor(f1 * b1 + f2 * data[[idx + 2]]);
     }
   }
+
+  contextRef.current.putImageData(imageData, x, y);
 }
 
 function erase(mouseX, mouseY, contextRef) {
@@ -69,23 +61,17 @@ function interpolate(activeMouseRef, mouseX, mouseY, contextRef, toolIdx) {
     }
   } else {
     const { xPos: prevX, yPos: prevY } = activeMouseRef.current;
-
-    // Calculate the differences in x and y
     const dx = mouseX - prevX;
     const dy = mouseY - prevY;
 
-    // Calculate the number of steps needed
     const steps = Math.max(Math.abs(dx), Math.abs(dy)) / step;
 
-    // Calculate the increment for each step
     const xIncrement = dx / steps;
     const yIncrement = dy / steps;
 
-    // Interpolate points and draw
     for (let i = 0; i <= steps; i++) {
       const x = Math.round(prevX + xIncrement * i);
       const y = Math.round(prevY + yIncrement * i);
-      // Call the escribe function at each interpolated point
       if (toolIdx == 0) {
         escribe(x, y, contextRef);
       } else {
@@ -110,6 +96,7 @@ function save() {
     unit: "px",
     format: [maxWidth, maxHeight],
   });
+
   SCREENS.forEach((screen, index) => {
     const x = (maxWidth - screen.width) / 2;
     const y = (maxHeight - screen.height) / 2;
@@ -127,11 +114,24 @@ const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
   const screenIdx = useRef(0);
 
   useEffect(() => {
-    onstart();
+    window.addEventListener("pointerdown", pointerDownHandler);
+    window.addEventListener("pointerup", pointerUpHandler);
+    window.addEventListener("pointermove", pointerMoveHandler);
+    window.addEventListener("pointerenter", pointerEnterHandler);
+    window.addEventListener("pointercancel", pointerUpHandler);
     window.addEventListener("resize", onresize);
     return () => {
+      window.removeEventListener("pointerdown", pointerDownHandler);
+      window.removeEventListener("pointerup", pointerUpHandler);
+      window.removeEventListener("pointermove", pointerMoveHandler);
+      window.removeEventListener("pointerenter", pointerEnterHandler);
+      window.removeEventListener("pointercancel", pointerUpHandler);
       window.removeEventListener("resize", onresize);
     };
+  }, [toolIdx]);
+
+  useEffect(() => {
+    onstart();
   }, [backgroundIdx]);
 
   useImperativeHandle(
@@ -178,10 +178,9 @@ const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
   );
 
   const loadScreenAt = (idx) => {
+    clearCanvas();
     if (SCREENS[idx]) {
       contextRef.current.putImageData(SCREENS[idx], 0, 0);
-    } else {
-      clearCanvas();
     }
     screenIdx.current = idx;
   };
@@ -237,6 +236,15 @@ const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
     ctx.putImageData(data, 0, 0);
   };
 
+  const pointerEnterHandler = (event) => {
+    const x = event.clientX;
+    const y = event.clientY;
+    if (activeMouseRef.current != null) {
+      activeMouseRef.current = { xPos: x, yPos: y };
+      interpolate(activeMouseRef, x, y, contextRef, toolIdx);
+    }
+  };
+
   const pointerDownHandler = (event) => {
     const x = event.clientX;
     const y = event.clientY;
@@ -260,17 +268,7 @@ const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
     activeMouseRef.current = null;
   };
 
-  return (
-    <canvas
-      id="board"
-      ref={canvasRef}
-      onPointerDown={pointerDownHandler}
-      onPointerMove={pointerMoveHandler}
-      onPointerUp={pointerUpHandler}
-      onPointerCancel={pointerUpHandler}
-      onPointerLeave={pointerUpHandler}
-    ></canvas>
-  );
+  return <canvas id="board" ref={canvasRef}></canvas>;
 });
 
 export default Board;
