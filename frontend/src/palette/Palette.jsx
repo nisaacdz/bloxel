@@ -13,6 +13,7 @@ import PrevTool from "./tools/Prev";
 import AddTool from "./tools/Add";
 import DelTool from "./tools/Del";
 import Background from "./tools/large/Background";
+import SaveTool from "./tools/save";
 
 const Palette = forwardRef(
   (
@@ -30,6 +31,7 @@ const Palette = forwardRef(
       addPage,
       nextPage,
       prevPage,
+      saveData,
     },
     ref
   ) => {
@@ -166,6 +168,7 @@ const Palette = forwardRef(
         <NextTool nextPage={nextPage} screenData={screenData} />
         <AddTool addPage={addPage} screenData={screenData} />
         <DelTool delPage={delPage} screenData={screenData} />
+        <SaveTool saveData={saveData}/>
         <button className="palette-resizer" onClick={onCollapse}>
           <img src="./min.svg" alt="minimize palette" />
         </button>

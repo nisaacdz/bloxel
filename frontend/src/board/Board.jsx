@@ -6,6 +6,7 @@ import React, {
 } from "react";
 import "./Board.css";
 import { BACKGROUNDS, MODIFIERS } from "../utils";
+import jsPDF from "jspdf";
 
 const SCREENS = [null];
 
@@ -54,6 +55,36 @@ function escribe(activeMouseRef, contextRef, toolIdx) {
   }
 }
 
+function save() {
+  let maxWidth = 0;
+  let maxHeight = 0;
+  SCREENS.forEach((screen) => {
+    maxWidth = Math.max(maxWidth, screen.width);
+    maxHeight = Math.max(maxHeight, screen.height);
+  });
+
+  const pdf = new jsPDF({
+    orientation: maxWidth > maxHeight ? "landscape" : "portrait",
+    unit: "px",
+    format: [maxWidth, maxHeight],
+  });
+  SCREENS.forEach((screen, index) => {
+    const x = (maxWidth - screen.width) / 2;
+    const y = (maxHeight - screen.height) / 2;
+    if (index > 0) pdf.addPage();
+    pdf.addImage(
+      screen,
+      "JPEG",
+      x,
+      y,
+      screen.width,
+      screen.height
+    );
+  });
+
+  pdf.save("screen_data.pdf");
+}
+
 const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
   const activeMouseRef = useRef(null);
   const canvasRef = useRef(null);
@@ -94,6 +125,10 @@ const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
         slidePage(screenIdx.current + 1);
         return { idx: screenIdx.current, size: SCREENS.length };
       },
+      saveData: () => {
+        updateScreensArray();
+        save();
+      },
       withinRect: (x, y) => {
         const rect = canvasRef.current.getBoundingClientRect();
         const x1 = rect.left;
@@ -117,6 +152,11 @@ const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
   };
 
   const slidePage = (idx) => {
+    updateScreensArray();
+    loadScreenAt(idx);
+  };
+
+  const updateScreensArray = () => {
     const canvas = canvasRef.current;
     SCREENS[screenIdx.current] = contextRef.current.getImageData(
       0,
@@ -124,7 +164,6 @@ const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
       canvas.width,
       canvas.height
     );
-    loadScreenAt(idx);
   };
 
   const clearCanvas = () => {
@@ -145,11 +184,16 @@ const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
     contextRef.current = ctx;
     clearCanvas();
-  }
+  };
 
   const onresize = () => {
     const canvas = canvasRef.current;
-    const data = contextRef.current.getImageData(0, 0, canvas.width, canvas.height);
+    const data = contextRef.current.getImageData(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
     const ctx = canvas.getContext("2d", { willReadFrequently: true });

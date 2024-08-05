@@ -1,16 +1,12 @@
 import React from "react";
 
 const AddTool = ({ addPage, screenData }) => {
-  const handleClick = () => {
-    addPage();
-  };
-
   return (
     <button
       id="add-tool"
       className="simple-btn active"
       title="New Page"
-      onClick={handleClick}
+      onClick={addPage}
     >
       <img
         className="add-tool-img tool-img"

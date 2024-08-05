@@ -59,6 +59,10 @@ function App() {
     setScreenData(boardRef.current.nextPage())
   }
 
+  const saveData = () => {
+    boardRef.current.saveData();
+  }
+
   const withinDrawingZone = (x, y) => {
     return (
       boardRef.current.withinRect(x, y) && !paletteRef.current.withinRect(x, y)
@@ -87,6 +91,7 @@ function App() {
         addPage={addPage}
         nextPage={nextPage}
         prevPage={prevPage}
+        saveData={saveData}
       />
       <Pointer
         toolIdx={modifierIdx}

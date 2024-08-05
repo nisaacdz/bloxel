@@ -1,15 +1,12 @@
 import React from "react";
 
-const SaveTool = ({ clearDrawingBoard }) => {
-  const handleClick = (event) => {
-    clearDrawingBoard();
-  };
+const SaveTool = ({ saveData }) => {
   return (
     <div
       id="save-tool"
       className="simple-btn active"
       title="save presentation"
-      onClick={handleClick}
+      onClick={saveData}
     >
       <img
         className="save-tool-img tool-img"
