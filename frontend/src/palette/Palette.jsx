@@ -37,7 +37,7 @@ const Palette = forwardRef(
   ) => {
     const [collapsed, setCollapsed] = useState(false);
     const container = useRef(null);
-    const size = useRef({ width: 630, height: 44 });
+    const size = useRef({ width: 660, height: 44 });
     const position = useRef({
       x: (window.innerWidth - size.current.width) / 2,
       y: window.innerHeight - size.current.height - 5,
@@ -114,7 +114,7 @@ const Palette = forwardRef(
 
     const onExpand = (event) => {
       event.stopPropagation();
-      size.current = { width: 630, height: 44 };
+      size.current = { width: 660, height: 44 };
       reposition();
       setCollapsed(false);
     };
@@ -168,7 +168,7 @@ const Palette = forwardRef(
         <NextTool nextPage={nextPage} screenData={screenData} />
         <AddTool addPage={addPage} screenData={screenData} />
         <DelTool delPage={delPage} screenData={screenData} />
-        <SaveTool saveData={saveData}/>
+        <SaveTool saveData={saveData} />
         <button className="palette-resizer" onClick={onCollapse}>
           <img src="./min.svg" alt="minimize palette" />
         </button>

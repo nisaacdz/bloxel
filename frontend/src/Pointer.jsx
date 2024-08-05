@@ -1,15 +1,28 @@
 import { useEffect, useRef } from "react";
 import "./Pointer.css";
-import { MODIFIERS } from "./utils";
+import { DefaultChalk, DefaultDuster } from "./utils";
 
-const Pointer = ({ colorIdx, designIdx, toolIdx, backgroundIdx, withinDrawingZone }) => {
+const Pointer = ({
+  colorIdx,
+  designIdx,
+  toolIdx,
+  backgroundIdx,
+  withinDrawingZone,
+}) => {
   const pointerToolRef = useRef(null);
   useEffect(() => {
     const canvas = pointerToolRef.current;
     const ctx = canvas.getContext("2d");
 
-    const width = MODIFIERS[toolIdx].sizeY();
-    const height = MODIFIERS[toolIdx].sizeX();
+    let tool = null;
+    if (toolIdx == 0) {
+      tool = DefaultChalk;
+    } else {
+      tool = DefaultDuster;
+    }
+
+    const width = tool.sizeY();
+    const height = tool.sizeX();
 
     canvas.width = height;
     canvas.height = width;
@@ -19,7 +32,7 @@ const Pointer = ({ colorIdx, designIdx, toolIdx, backgroundIdx, withinDrawingZon
 
     for (let x = 0; x < width; x++) {
       for (let y = 0; y < height; y++) {
-        const [r, g, b, a] = MODIFIERS[toolIdx].idx_ptr(x, y);
+        const [r, g, b, a] = tool.idx_ptr(x, y);
         const index = (x * height + y) * 4;
         data[index] = r;
         data[index + 1] = g;
@@ -49,8 +62,14 @@ const Pointer = ({ colorIdx, designIdx, toolIdx, backgroundIdx, withinDrawingZon
   };
 
   const reposition = (posX, posY) => {
-    const x = posX - Math.floor(MODIFIERS[toolIdx].sizeX() / 2);
-    const y = posY - Math.floor(MODIFIERS[toolIdx].sizeY() / 2);
+    let tool = null;
+    if (toolIdx == 0) {
+      tool = DefaultChalk;
+    } else {
+      tool = DefaultDuster;
+    }
+    const x = posX - Math.floor(tool.sizeX() / 2);
+    const y = posY - Math.floor(tool.sizeY() / 2);
     pointerToolRef.current.style.transform = `translate(${x}px, ${y}px)`;
   };
 
@@ -65,7 +84,7 @@ const Pointer = ({ colorIdx, designIdx, toolIdx, backgroundIdx, withinDrawingZon
     }
   };
 
-  return <canvas ref={pointerToolRef} id="pointer-tool"/>;
+  return <canvas ref={pointerToolRef} id="pointer-tool" />;
 };
 
 export default Pointer;

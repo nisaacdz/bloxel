@@ -6,7 +6,7 @@ import {
   COLORS,
   DESIGNS,
   BACKGROUNDS,
-  MODIFIERS,
+  DefaultDuster,
 } from "./utils";
 import Palette from "./palette/Palette";
 import Pointer from "./Pointer";
@@ -21,7 +21,7 @@ function App() {
   const [designIdx, setDesignIdx] = useState(0);
 
   const updateBackgroundIdx = (idx) => {
-    MODIFIERS[1].changeBackground(BACKGROUNDS[idx]);
+    DefaultDuster.changeBackground(BACKGROUNDS[idx]);
     setBackgroundIdx(idx);
   };
 
@@ -44,24 +44,24 @@ function App() {
   };
 
   const delPage = () => {
-    setScreenData(boardRef.current.delPage())
-  }
+    setScreenData(boardRef.current.delPage());
+  };
 
   const addPage = () => {
-    setScreenData(boardRef.current.addPage())
-  }
+    setScreenData(boardRef.current.addPage());
+  };
 
   const prevPage = () => {
-    setScreenData(boardRef.current.prevPage())
-  }
+    setScreenData(boardRef.current.prevPage());
+  };
 
   const nextPage = () => {
-    setScreenData(boardRef.current.nextPage())
-  }
+    setScreenData(boardRef.current.nextPage());
+  };
 
   const saveData = () => {
     boardRef.current.saveData();
-  }
+  };
 
   const withinDrawingZone = (x, y) => {
     return (

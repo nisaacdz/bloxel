@@ -5,54 +5,96 @@ import React, {
   useRef,
 } from "react";
 import "./Board.css";
-import { BACKGROUNDS, MODIFIERS } from "../utils";
+import { BACKGROUNDS, DefaultChalk, DefaultDuster } from "../utils";
 import jsPDF from "jspdf";
 
 const SCREENS = [null];
 
-function escribe(activeMouseRef, contextRef, toolIdx) {
-  if (activeMouseRef.current != null) {
-    const { xPos: mouseX, yPos: mouseY } = activeMouseRef.current;
+function escribe(mouseX, mouseY, contextRef) {
+  const boardWidth = contextRef.current.canvas.width;
+  const boardHeight = contextRef.current.canvas.height;
+  const tool = DefaultChalk;
 
-    const boardWidth = contextRef.current.canvas.width;
-    const boardHeight = contextRef.current.canvas.height;
-    const tool = MODIFIERS[toolIdx];
+  const midi = Math.floor(tool.sizeX() / 2);
+  const midj = Math.floor(tool.sizeY() / 2);
 
-    const midi = Math.floor(tool.sizeX() / 2);
-    const midj = Math.floor(tool.sizeY() / 2);
+  for (let tj = 0; tj < tool.sizeY(); tj++) {
+    for (let ti = 0; ti < tool.sizeX(); ti++) {
+      const [r1, g1, b1, a] = tool.idx(tj, ti);
 
-    for (let tj = 0; tj < tool.sizeY(); tj++) {
-      for (let ti = 0; ti < tool.sizeX(); ti++) {
-        const [r1, g1, b1, a] = tool.idx(tj, ti);
+      const ni = mouseX + ti - midi;
+      const nj = mouseY + tj - midj;
 
-        const ni = mouseX + ti - midi;
-        const nj = mouseY + tj - midj;
+      if (ni >= 0 && ni < boardWidth && nj >= 0 && nj < boardHeight) {
+        const [r2, g2, b2] = contextRef.current.getImageData(ni, nj, 1, 1).data;
 
-        if (ni >= 0 && ni < boardWidth && nj >= 0 && nj < boardHeight) {
-          const [r2, g2, b2] = contextRef.current.getImageData(
-            ni,
-            nj,
-            1,
-            1
-          ).data;
+        const f1 = a / 255;
+        const f2 = 1.0 - f1;
 
-          const f1 = a / 255;
-          const f2 = 1.0 - f1;
+        const r = f1 * r1 + f2 * r2;
+        const g = f1 * g1 + f2 * g2;
+        const b = f1 * b1 + f2 * b2;
 
-          const r = f1 * r1 + f2 * r2;
-          const g = f1 * g1 + f2 * g2;
-          const b = f1 * b1 + f2 * b2;
-
-          const imageData = contextRef.current.getImageData(ni, nj, 1, 1);
-          const pixel = imageData.data;
-          pixel[0] = Math.floor(r);
-          pixel[1] = Math.floor(g);
-          pixel[2] = Math.floor(b);
-          contextRef.current.putImageData(imageData, ni, nj);
-        }
+        const imageData = contextRef.current.getImageData(ni, nj, 1, 1);
+        const pixel = imageData.data;
+        pixel[0] = Math.floor(r);
+        pixel[1] = Math.floor(g);
+        pixel[2] = Math.floor(b);
+        contextRef.current.putImageData(imageData, ni, nj);
       }
     }
   }
+}
+
+function erase(mouseX, mouseY, contextRef) {
+  const [r, g, b, a] = DefaultDuster.color();
+  const x = mouseX - Math.floor(DefaultDuster.sizeX() / 2);
+  const y = mouseY - Math.floor(DefaultDuster.sizeY() / 2);
+  contextRef.current.fillStyle = `rgba(${r}, ${g}, ${b}, ${a})`;
+  contextRef.current.fillRect(
+    x,
+    y,
+    DefaultDuster.sizeX(),
+    DefaultDuster.sizeY()
+  );
+}
+
+function interpolate(activeMouseRef, mouseX, mouseY, contextRef, toolIdx) {
+  const step = 3;
+  if (!activeMouseRef.current) {
+    if (toolIdx == 0) {
+      escribe(mouseX, mouseY, contextRef);
+    } else {
+      erase(mouseX, mouseY, contextRef);
+    }
+  } else {
+    const { xPos: prevX, yPos: prevY } = activeMouseRef.current;
+
+    // Calculate the differences in x and y
+    const dx = mouseX - prevX;
+    const dy = mouseY - prevY;
+
+    // Calculate the number of steps needed
+    const steps = Math.max(Math.abs(dx), Math.abs(dy)) / step;
+
+    // Calculate the increment for each step
+    const xIncrement = dx / steps;
+    const yIncrement = dy / steps;
+
+    // Interpolate points and draw
+    for (let i = 0; i <= steps; i++) {
+      const x = Math.round(prevX + xIncrement * i);
+      const y = Math.round(prevY + yIncrement * i);
+      // Call the escribe function at each interpolated point
+      if (toolIdx == 0) {
+        escribe(x, y, contextRef);
+      } else {
+        erase(x, y, contextRef);
+      }
+    }
+  }
+
+  activeMouseRef.current = { xPos: mouseX, yPos: mouseY };
 }
 
 function save() {
@@ -72,14 +114,7 @@ function save() {
     const x = (maxWidth - screen.width) / 2;
     const y = (maxHeight - screen.height) / 2;
     if (index > 0) pdf.addPage();
-    pdf.addImage(
-      screen,
-      "JPEG",
-      x,
-      y,
-      screen.width,
-      screen.height
-    );
+    pdf.addImage(screen, "JPEG", x, y, screen.width, screen.height);
   });
 
   pdf.save("screen_data.pdf");
@@ -207,22 +242,21 @@ const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
     const y = event.clientY;
     if (event.button == 0) {
       event.stopPropagation();
-      activeMouseRef.current = { xPos: x, yPos: y };
-      escribe(activeMouseRef, contextRef, toolIdx);
+      interpolate(activeMouseRef, x, y, contextRef, toolIdx);
     }
   };
 
   const pointerMoveHandler = (event) => {
-    event.stopPropagation();
+    event.preventDefault();
     const x = event.clientX;
     const y = event.clientY;
     if (activeMouseRef.current != null) {
-      activeMouseRef.current = { xPos: x, yPos: y };
-      escribe(activeMouseRef, contextRef, toolIdx);
+      interpolate(activeMouseRef, x, y, contextRef, toolIdx);
     }
   };
 
   const pointerUpHandler = (event) => {
+    event.preventDefault();
     activeMouseRef.current = null;
   };
 
@@ -234,6 +268,7 @@ const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
       onPointerMove={pointerMoveHandler}
       onPointerUp={pointerUpHandler}
       onPointerCancel={pointerUpHandler}
+      onPointerLeave={pointerUpHandler}
     ></canvas>
   );
 });
