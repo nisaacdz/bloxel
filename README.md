@@ -12,7 +12,7 @@ Bloxel is a digital chalkboard application built with Tauri and React. It is des
 
 ## Screenshots
 
-![Screenshot 3](./.screenshots/record2.gif)
+![Screenshot](./.screenshots/record.gif)
 
 ## Installation
 

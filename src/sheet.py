@@ -107,7 +107,7 @@ def merge_bases(val1: int, val2: int) -> tuple[int, int, int]:
     return red, green, blue
 
 
-trace = [[(0,0,0,0) for _ in range(0, 15)] for _ in range(0, 15)]
+trace = [[(0,0,0,0) for _ in range(0, 10)] for _ in range(0, 10)]
 
 midi = len(trace) // 2
 midj = len(trace[0]) // 2
@@ -119,13 +119,13 @@ max_dist = max(midi, midj)**2
 #         alpha = min(max(0, int(255 - 255 * dist / max_dist)), 255)
 #         red, green, blue = 255, 255, 255
 #         shift = abs(midj - j)
-#         if shift <= 3:
+#         if shift <= 2:
 #             r = shift
-#             w = 3 - shift
+#             w = 2 - shift
 #             red, green, blue = merge_bases(r**2, w**2)
-#         elif shift <= 6:
-#             r = 6 - shift
-#             w = shift - 3
+#         elif shift <= 4:
+#             r = 4 - shift
+#             w = shift - 2
 #             red, green, blue = merge_bases(r**2, w**2)
 #         else:
 #             red, green, blue = color2
