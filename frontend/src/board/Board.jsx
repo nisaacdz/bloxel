@@ -23,15 +23,23 @@ function escribe(mouseX, mouseY, contextRef) {
 
   for (let i = 0; i < n; i++) {
     for (let j = 0; j < m; j++) {
-      const [r1, g1, b1, a] = tool.idx(i, j);
       const idx = (i * m + j) * 4;
+      const [r1, g1, b1, a1] = tool.idx(i, j);
+      const r2 = data[idx],
+        g2 = data[idx + 1],
+        b2 = data[idx + 2],
+        a2 = data[idx + 3];
+      const sumA = a1 + a2;
 
-      const f1 = a / 255;
-      const f2 = 1.0 - f1;
+      const r = (r1 * a1 + r2 * a2) / sumA;
+      const g = (g1 * a1 + g2 * a2) / sumA;
+      const b = (b1 * a1 + b2 * a2) / sumA;
+      const a = a1 + Math.round((a2 / 255) * (255 - a1));
 
-      data[idx] = Math.floor(f1 * r1 + f2 * data[idx]);
-      data[idx + 1] = Math.floor(f1 * g1 + f2 * data[idx + 1]);
-      data[idx + 2] = Math.floor(f1 * b1 + f2 * data[[idx + 2]]);
+      data[idx] = r;
+      data[idx + 1] = g;
+      data[idx + 2] = b;
+      data[idx + 3] = a;
     }
   }
 
@@ -39,11 +47,9 @@ function escribe(mouseX, mouseY, contextRef) {
 }
 
 function erase(mouseX, mouseY, contextRef) {
-  const [r, g, b, a] = DefaultDuster.color();
   const x = mouseX - Math.floor(DefaultDuster.sizeX() / 2);
   const y = mouseY - Math.floor(DefaultDuster.sizeY() / 2);
-  contextRef.current.fillStyle = `rgba(${r}, ${g}, ${b}, ${a})`;
-  contextRef.current.fillRect(
+  contextRef.current.clearRect(
     x,
     y,
     DefaultDuster.sizeX(),
@@ -52,7 +58,7 @@ function erase(mouseX, mouseY, contextRef) {
 }
 
 function interpolate(activeMouseRef, mouseX, mouseY, contextRef, toolIdx) {
-  const step = 3;
+  const step = 1;
   if (!activeMouseRef.current) {
     if (toolIdx == 0) {
       escribe(mouseX, mouseY, contextRef);
@@ -66,16 +72,18 @@ function interpolate(activeMouseRef, mouseX, mouseY, contextRef, toolIdx) {
 
     const steps = Math.max(Math.abs(dx), Math.abs(dy)) / step;
 
-    const xIncrement = dx / steps;
-    const yIncrement = dy / steps;
+    if (steps !== 0) {
+      const xIncrement = dx / steps;
+      const yIncrement = dy / steps;
 
-    for (let i = 0; i <= steps; i++) {
-      const x = Math.round(prevX + xIncrement * i);
-      const y = Math.round(prevY + yIncrement * i);
-      if (toolIdx == 0) {
-        escribe(x, y, contextRef);
-      } else {
-        erase(x, y, contextRef);
+      for (let i = 0; i <= steps; i++) {
+        const x = Math.round(prevX + xIncrement * i);
+        const y = Math.round(prevY + yIncrement * i);
+        if (toolIdx == 0) {
+          escribe(x, y, contextRef);
+        } else {
+          erase(x, y, contextRef);
+        }
       }
     }
   }
@@ -83,7 +91,7 @@ function interpolate(activeMouseRef, mouseX, mouseY, contextRef, toolIdx) {
   activeMouseRef.current = { xPos: mouseX, yPos: mouseY };
 }
 
-function save() {
+function save(backgroundColor) {
   let maxWidth = 0;
   let maxHeight = 0;
   SCREENS.forEach((screen) => {
@@ -97,7 +105,26 @@ function save() {
     format: [maxWidth, maxHeight],
   });
 
+  const [r1, g1, b1, _] = backgroundColor;
+
   SCREENS.forEach((screen, index) => {
+    for (let i = 0; i < screen.width; i++) {
+      for (let j = 0; j < screen.height; j++) {
+        const idx = (i * screen.height + j) * 4;
+        const r2 = screen.data[idx];
+        const g2 = screen.data[idx + 1];
+        const b2 = screen.data[idx + 2];
+        const a2 = screen.data[idx + 3];
+
+        const f2 = a2 / 255;
+        const f1 = 1.0 - f2;
+
+        screen.data[idx] = Math.floor(f1 * r1 + f2 * r2);
+        screen.data[idx + 1] = Math.floor(f1 * g1 + f2 * g2);
+        screen.data[idx + 2] = Math.floor(f1 * b1 + f2 * b2);
+        screen.data[idx + 3] = 255;
+      }
+    }
     const x = (maxWidth - screen.width) / 2;
     const y = (maxHeight - screen.height) / 2;
     if (index > 0) pdf.addPage();
@@ -114,25 +141,19 @@ const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
   const screenIdx = useRef(0);
 
   useEffect(() => {
-    window.addEventListener("pointerdown", pointerDownHandler);
-    window.addEventListener("pointerup", pointerUpHandler);
-    window.addEventListener("pointermove", pointerMoveHandler);
-    window.addEventListener("pointerenter", pointerEnterHandler);
-    window.addEventListener("pointercancel", pointerUpHandler);
     window.addEventListener("resize", onresize);
     return () => {
-      window.removeEventListener("pointerdown", pointerDownHandler);
-      window.removeEventListener("pointerup", pointerUpHandler);
-      window.removeEventListener("pointermove", pointerMoveHandler);
-      window.removeEventListener("pointerenter", pointerEnterHandler);
-      window.removeEventListener("pointercancel", pointerUpHandler);
       window.removeEventListener("resize", onresize);
     };
-  }, [toolIdx]);
+  }, []);
+
+  useEffect(() => {
+    resetBackground();
+  }, [backgroundIdx]);
 
   useEffect(() => {
     onstart();
-  }, [backgroundIdx]);
+  }, []);
 
   useImperativeHandle(
     ref,
@@ -162,7 +183,7 @@ const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
       },
       saveData: () => {
         updateScreensArray();
-        save();
+        save(BACKGROUNDS[backgroundIdx]);
       },
       withinRect: (x, y) => {
         const rect = canvasRef.current.getBoundingClientRect();
@@ -200,10 +221,14 @@ const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
     );
   };
 
-  const clearCanvas = () => {
+  const resetBackground = () => {
     const background = BACKGROUNDS[backgroundIdx];
-    contextRef.current.fillStyle = `rgb(${background[0]}, ${background[1]}, ${background[2]})`;
-    contextRef.current.fillRect(
+    const color = `rgb(${background[0]}, ${background[1]}, ${background[2]})`;
+    canvasRef.current.style.backgroundColor = color;
+  };
+
+  const clearCanvas = () => {
+    contextRef.current.clearRect(
       0,
       0,
       canvasRef.current.width,
@@ -217,7 +242,6 @@ const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
     canvas.height = canvas.clientHeight;
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
     contextRef.current = ctx;
-    clearCanvas();
   };
 
   const onresize = () => {
@@ -232,7 +256,6 @@ const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
     canvas.height = canvas.clientHeight;
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
     contextRef.current = ctx;
-    clearCanvas();
     ctx.putImageData(data, 0, 0);
   };
 
@@ -240,7 +263,7 @@ const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
     const x = event.clientX;
     const y = event.clientY;
     if (activeMouseRef.current != null) {
-      activeMouseRef.current = { xPos: x, yPos: y };
+      activeMouseRef.current = null;
       interpolate(activeMouseRef, x, y, contextRef, toolIdx);
     }
   };
@@ -268,7 +291,17 @@ const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
     activeMouseRef.current = null;
   };
 
-  return <canvas id="board" ref={canvasRef}></canvas>;
+  return (
+    <canvas
+      id="board"
+      ref={canvasRef}
+      onPointerEnter={pointerEnterHandler}
+      onPointerDown={pointerDownHandler}
+      onPointerMove={pointerMoveHandler}
+      onPointerUp={pointerUpHandler}
+      onPointerCancel={pointerUpHandler}
+    ></canvas>
+  );
 });
 
 export default Board;

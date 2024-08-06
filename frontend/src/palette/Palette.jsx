@@ -131,6 +131,7 @@ const Palette = forwardRef(
           style={{
             transform: `translate(${position.current.x}px, ${position.current.y}px)`,
           }}
+          onClick={(event) => event.stopPropagation()}
         >
           <button className="palette-resizer" onClick={onExpand}>
             <img src="./max.svg" alt="maximize palette" />
@@ -150,6 +151,7 @@ const Palette = forwardRef(
         style={{
           transform: `translate(${position.current.x}px, ${position.current.y}px)`,
         }}
+        onClick={(event) => event.stopPropagation()}
       >
         <Background
           backgroundIdx={backgroundIdx}
