@@ -348,6 +348,7 @@ const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
     const y = event.clientY;
     if (event.button == 0) {
       event.stopPropagation();
+      activeMouseRef.current = null;
       interpolate(activeMouseRef, x, y, contextRef, toolIdx);
     }
   };
