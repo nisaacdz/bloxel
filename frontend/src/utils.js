@@ -262,11 +262,11 @@ function translate(cur, sim, end) {
   }
 }
 
-class Chalk {
-  constructor(design, original) {
+export class Chalk {
+  constructor(design, color) {
     this.design = design;
-    this.original = original;
-    this.newcolor = original;
+    this.original = DEFAULT_CHALK_COLOR;
+    this.newcolor = color;
   }
 
   name() {
@@ -308,21 +308,13 @@ class Chalk {
   }
 }
 
-export function createChalk(design, color) {
-  const chalk = new Chalk(design, DEFAULT_CHALK_COLOR);
-  chalk.changeColor(color);
-  return chalk;
-}
-
-export const DefaultChalk = new Chalk(DEFAULT_CHALK_TRACE, DEFAULT_CHALK_COLOR);
-
 export const COLORS = [
+  [255, 127, 64],
+  [255, 255, 255],
   [65, 72, 205],
   [240, 25, 100],
   [0, 64, 64],
   [165, 75, 165],
-  [255, 127, 50],
-  [255, 255, 255],
   [0, 0, 0],
 ];
 
@@ -334,7 +326,9 @@ export const BACKGROUNDS = [
   [190, 120, 120, 255],
 ];
 
-export const DESIGNS = [DEFAULT_CHALK_TRACE, SOLID_CHALK_TRACE];
+export const DESIGNS = [SOLID_CHALK_TRACE, DEFAULT_CHALK_TRACE];
+
+export const DefaultChalk = new Chalk(DESIGNS[0], COLORS[0]);
 
 class Duster {
   constructor(background) {

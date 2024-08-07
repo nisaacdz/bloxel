@@ -1,11 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import {
-  createChalk,
-  COLORS,
-  DESIGNS,
-  DefaultChalk,
-  complement,
-} from "../../../utils";
+import { Chalk, COLORS, DESIGNS, complement } from "../../../utils";
 import "./Chalk.css";
 
 const ChalkColorPreview = ({
@@ -58,7 +52,7 @@ const ChalkDesignPreview = ({ active, designIdx, colorIdx, handleClick }) => {
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    const chalk = createChalk(DESIGNS[designIdx], COLORS[colorIdx]);
+    const chalk = new Chalk(DESIGNS[designIdx], COLORS[colorIdx]);
 
     const width = chalk.sizeY();
     const height = chalk.sizeX();
