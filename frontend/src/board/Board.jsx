@@ -10,6 +10,50 @@ import jsPDF from "jspdf";
 
 const SCREENS = [null];
 
+/*
+class PointQueue {
+  constructor(maxSize) {
+    this.queue = [];
+    this.maxSize = maxSize;
+  }
+
+  enqueue(point) {
+    if (this.queue.length >= this.maxSize) {
+      this.queue.shift(); // Remove the first element if the queue is full
+    }
+    this.queue.push(point); // Add the new point
+  }
+
+  len() {
+    return this.queue.length;
+  }
+
+  dequeue() {
+    return this.queue.shift(); // Remove and return the first element
+  }
+
+  getQueue() {
+    return this.queue; // Return the current state of the queue
+  }
+}
+
+
+function catmullRomSpline(p0, p1, p2, p3, t) {
+  let t2 = t * t;
+  let t3 = t2 * t;
+
+  let f1 = -0.5 * t3 + t2 - 0.5 * t;
+  let f2 =  1.5 * t3 - 2.5 * t2 + 1.0;
+  let f3 = -1.5 * t3 + 2.0 * t2 + 0.5 * t;
+  let f4 =  0.5 * t3 - 0.5 * t2;
+
+  let x = p0.x * f1 + p1.x * f2 + p2.x * f3 + p3.x * f4;
+  let y = p0.y * f1 + p1.y * f2 + p2.y * f3 + p3.y * f4;
+
+  return { x, y };
+}
+*/
+
 function escribe(mouseX, mouseY, contextRef) {
   const tool = DefaultChalk;
 
@@ -57,16 +101,53 @@ function erase(mouseX, mouseY, contextRef) {
   );
 }
 
-function interpolate(activeMouseRef, mouseX, mouseY, contextRef, toolIdx) {
+class PointQueue {
+  constructor(maxSize) {
+    this.queue = [];
+    this.maxSize = maxSize;
+  }
+
+  enqueue(point) {
+    if (this.queue.length >= this.maxSize) {
+      this.queue.shift(); // Remove the first element if the queue is full
+    }
+    this.queue.push(point); // Add the new point
+  }
+
+  dequeue() {
+    return this.queue.shift(); // Remove and return the first element
+  }
+
+  getQueue() {
+    return this.queue; // Return the current state of the queue
+  }
+}
+
+function catmullRomSpline(p0, p1, p2, p3, t) {
+  let t2 = t * t;
+  let t3 = t2 * t;
+
+  let f1 = -0.5 * t3 + t2 - 0.5 * t;
+  let f2 = 1.5 * t3 - 2.5 * t2 + 1.0;
+  let f3 = -1.5 * t3 + 2.0 * t2 + 0.5 * t;
+  let f4 = 0.5 * t3 - 0.5 * t2;
+
+  let x = p0.xPos * f1 + p1.xPos * f2 + p2.xPos * f3 + p3.xPos * f4;
+  let y = p0.yPos * f1 + p1.yPos * f2 + p2.yPos * f3 + p3.yPos * f4;
+
+  return { x, y };
+}
+
+function linearInterpolate(points, mouseX, mouseY, contextRef, toolIdx) {
   const step = 1;
-  if (!activeMouseRef.current) {
-    if (toolIdx == 0) {
+  if (points.length === 0) {
+    if (toolIdx === 0) {
       escribe(mouseX, mouseY, contextRef);
     } else {
       erase(mouseX, mouseY, contextRef);
     }
   } else {
-    const { xPos: prevX, yPos: prevY } = activeMouseRef.current;
+    const { xPos: prevX, yPos: prevY } = points[0];
     const dx = mouseX - prevX;
     const dy = mouseY - prevY;
 
@@ -79,7 +160,7 @@ function interpolate(activeMouseRef, mouseX, mouseY, contextRef, toolIdx) {
       for (let i = 0; i <= steps; i++) {
         const x = Math.round(prevX + xIncrement * i);
         const y = Math.round(prevY + yIncrement * i);
-        if (toolIdx == 0) {
+        if (toolIdx === 0) {
           escribe(x, y, contextRef);
         } else {
           erase(x, y, contextRef);
@@ -87,8 +168,56 @@ function interpolate(activeMouseRef, mouseX, mouseY, contextRef, toolIdx) {
       }
     }
   }
+}
 
-  activeMouseRef.current = { xPos: mouseX, yPos: mouseY };
+function interpolate(activeMouseRef, mouseX, mouseY, contextRef, toolIdx) {
+  if (!activeMouseRef.current) {
+    // Initialize PointQueue if null
+    activeMouseRef.current = new PointQueue(4);
+  }
+
+  const pointQueue = activeMouseRef.current;
+  const points = pointQueue.getQueue();
+
+  // Ensure we have at least four points for interpolation
+  if (points.length < 3) {
+    linearInterpolate(points, mouseX, mouseY, contextRef, toolIdx);
+    pointQueue.enqueue({ xPos: mouseX, yPos: mouseY });
+    return;
+  }
+
+  const { xPos: prevX, yPos: prevY } = points[points.length - 1];
+  const maxDiff = Math.max(Math.abs(prevX - mouseX), Math.abs(prevY - mouseY));
+
+  if (maxDiff === 0) {
+    return;
+  }
+
+  const step = 1 / maxDiff;
+  // Enqueue the current mouse position
+  pointQueue.enqueue({ xPos: mouseX, yPos: mouseY });
+
+  const cpoints = activeMouseRef.current.getQueue();
+
+  // Draw using Catmull-Rom spline interpolation
+  for (let t = step; t <= 1; t += step) {
+    // Adjust the step size for smoothness
+    const p = catmullRomSpline(
+      cpoints[0],
+      cpoints[1],
+      cpoints[2],
+      cpoints[3],
+      t
+    );
+    const x = Math.round(p.x);
+    const y = Math.round(p.y);
+
+    if (toolIdx === 0) {
+      escribe(x, y, contextRef);
+    } else {
+      erase(x, y, contextRef);
+    }
+  }
 }
 
 function save(backgroundColor) {
