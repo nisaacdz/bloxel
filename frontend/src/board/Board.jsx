@@ -66,13 +66,13 @@ class PointQueue {
 
   enqueue(point) {
     if (this.queue.length >= this.maxSize) {
-      this.queue.shift(); // Remove the first element if the queue is full
+      this.queue.shift();
     }
-    this.queue.push(point); // Add the new point
+    this.queue.push(point);
   }
 
   getQueue() {
-    return this.queue; // Return the current state of the queue
+    return this.queue;
   }
 }
 
