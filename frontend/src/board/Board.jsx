@@ -7,6 +7,7 @@ import React, {
 import "./Board.css";
 import { BACKGROUNDS, DefaultChalk, DefaultDuster } from "../utils";
 import jsPDF from "jspdf";
+import { CurveInterpolator } from "curve-interpolator";
 
 const SCREENS = [null];
 
@@ -60,7 +61,7 @@ function erase(mouseX, mouseY, contextRef) {
 class PointQueue {
   constructor() {
     this.queue = [];
-    this.maxSize = 4;
+    this.maxSize = 5;
   }
 
   enqueue(point) {
@@ -75,42 +76,6 @@ class PointQueue {
   }
 }
 
-function cubicBezierSpline(p0, p1, p2, p3, t) {
-  let t2 = t * t;
-  let t3 = t2 * t;
-  let mt = 1 - t;
-  let mt2 = mt * mt;
-  let mt3 = mt2 * mt;
-
-  let x =
-    mt3 * p0.xPos +
-    3 * mt2 * t * p1.xPos +
-    3 * mt * t2 * p2.xPos +
-    t3 * p3.xPos;
-  let y =
-    mt3 * p0.yPos +
-    3 * mt2 * t * p1.yPos +
-    3 * mt * t2 * p2.yPos +
-    t3 * p3.yPos;
-
-  return { x, y };
-}
-
-function catmullRomSpline(p0, p1, p2, p3, t) {
-  let t2 = t * t;
-  let t3 = t2 * t;
-
-  let f1 = -0.5 * t3 + t2 - 0.5 * t;
-  let f2 = 1.5 * t3 - 2.5 * t2 + 1.0;
-  let f3 = -1.5 * t3 + 2.0 * t2 + 0.5 * t;
-  let f4 = 0.5 * t3 - 0.5 * t2;
-
-  let x = p0.xPos * f1 + p1.xPos * f2 + p2.xPos * f3 + p3.xPos * f4;
-  let y = p0.yPos * f1 + p1.yPos * f2 + p2.yPos * f3 + p3.yPos * f4;
-
-  return { x, y };
-}
-
 function linearInterpolate(points, mouseX, mouseY, contextRef, toolIdx) {
   const step = 1;
   if (points.length === 0) {
@@ -120,7 +85,7 @@ function linearInterpolate(points, mouseX, mouseY, contextRef, toolIdx) {
       erase(mouseX, mouseY, contextRef);
     }
   } else {
-    const { xPos: prevX, yPos: prevY } = points[0];
+    const [prevX, prevY] = points[0];
     const dx = mouseX - prevX;
     const dy = mouseY - prevY;
 
@@ -151,19 +116,22 @@ function interpolate(activeMouseRef, mouseX, mouseY, contextRef, toolIdx) {
   const pointQueue = activeMouseRef.current;
   const points = pointQueue.getQueue();
 
-  if (points.length < 3) {
-    linearInterpolate(points, mouseX, mouseY, contextRef, toolIdx);
-    pointQueue.enqueue({ xPos: mouseX, yPos: mouseY });
+  if (points.length == 0) {
+    if (toolIdx === 0) {
+      escribe(mouseX, mouseY, contextRef);
+    } else {
+      erase(mouseX, mouseY, contextRef);
+    }
+    pointQueue.enqueue([mouseX, mouseY]);
     return;
   }
 
   const lastPoint = points[points.length - 1];
 
   const totalSteps = Math.ceil(
-    1.2 *
+    1.1 *
       Math.sqrt(
-        Math.pow(mouseX - lastPoint.xPos, 2) +
-          Math.pow(mouseY - lastPoint.yPos, 2)
+        Math.pow(mouseX - lastPoint[0], 2) + Math.pow(mouseY - lastPoint[1], 2)
       )
   );
 
@@ -171,20 +139,17 @@ function interpolate(activeMouseRef, mouseX, mouseY, contextRef, toolIdx) {
     return;
   }
 
-  const diffT = 1 / totalSteps;
-  pointQueue.enqueue({ xPos: mouseX, yPos: mouseY });
+  pointQueue.enqueue([mouseX, mouseY]);
 
-  for (let t = diffT; t <= 1; t += diffT) {
-    const p = cubicBezierSpline(points[0], points[1], points[2], points[3], t);
-    const x = Math.round(p.x);
-    const y = Math.round(p.y);
+  const interp = new CurveInterpolator(points, { tension: 0.2, alpha: 0.5 });
 
+  interp.getPoints(totalSteps).forEach((point) => {
     if (toolIdx === 0) {
-      escribe(x, y, contextRef);
+      escribe(point[0], point[1], contextRef);
     } else {
-      erase(x, y, contextRef);
+      erase(point[0], point[1], contextRef);
     }
-  }
+  });
 }
 
 function save(backgroundColor) {
