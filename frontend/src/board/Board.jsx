@@ -10,7 +10,6 @@ import jsPDF from "jspdf";
 
 const SCREENS = [null];
 
-
 function escribe(mouseX, mouseY, contextRef) {
   const tool = DefaultChalk;
 
@@ -76,6 +75,45 @@ class PointQueue {
   }
 }
 
+function cubicBezierSpline(p0, p1, p2, p3, t) {
+  let t2 = t * t;
+  let t3 = t2 * t;
+  let mt = 1 - t;
+  let mt2 = mt * mt;
+  let mt3 = mt2 * mt;
+
+  let x =
+    mt3 * p0.xPos +
+    3 * mt2 * t * p1.xPos +
+    3 * mt * t2 * p2.xPos +
+    t3 * p3.xPos;
+  let y =
+    mt3 * p0.yPos +
+    3 * mt2 * t * p1.yPos +
+    3 * mt * t2 * p2.yPos +
+    t3 * p3.yPos;
+
+  return { x, y };
+}
+
+/*
+void bezierCurve(int x[] , int y[])
+{
+    double xu = 0.0 , yu = 0.0 , u = 0.0 ;
+    int i = 0 ;
+    for(u = 0.0 ; u <= 1.0 ; u += 0.0001)
+    {
+        xu = pow(1-u,3)*x[0]+3*u*pow(1-u,2)*x[1]+3*pow(u,2)*(1-u)*x[2]
+             +pow(u,3)*x[3];
+        yu = pow(1-u,3)*y[0]+3*u*pow(1-u,2)*y[1]+3*pow(u,2)*(1-u)*y[2]
+            +pow(u,3)*y[3];
+        SDL_RenderDrawPoint(renderer , (int)xu , (int)yu) ;
+    }
+}
+
+Use the bove implementation (but fit it for my use case). It seems they made use of 3 points on the 
+*/
+
 function catmullRomSpline(p0, p1, p2, p3, t) {
   let t2 = t * t;
   let t3 = t2 * t;
@@ -137,24 +175,25 @@ function interpolate(activeMouseRef, mouseX, mouseY, contextRef, toolIdx) {
     return;
   }
 
-  const { xPos: prevX, yPos: prevY } = points[points.length - 1];
-  const maxDiff = Math.abs(prevX - mouseX) + Math.abs(prevY - mouseY);
+  const lastPoint = points[points.length - 1];
 
-  if (maxDiff === 0) {
+  const totalSteps = Math.ceil(
+    1.2 *
+      Math.sqrt(
+        Math.pow(mouseX - lastPoint.xPos, 2) +
+          Math.pow(mouseY - lastPoint.yPos, 2)
+      )
+  );
+
+  if (totalSteps === 0) {
     return;
   }
 
-  const step = 1 / maxDiff;
+  const diffT = 1 / totalSteps;
   pointQueue.enqueue({ xPos: mouseX, yPos: mouseY });
 
-  for (let t = step; t <= 1; t += step) {
-    const p = catmullRomSpline(
-      points[0],
-      points[1],
-      points[2],
-      points[3],
-      t
-    );
+  for (let t = diffT; t <= 1; t += diffT) {
+    const p = cubicBezierSpline(points[0], points[1], points[2], points[3], t);
     const x = Math.round(p.x);
     const y = Math.round(p.y);
 
