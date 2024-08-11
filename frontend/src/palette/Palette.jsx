@@ -171,6 +171,7 @@ const Palette = forwardRef(
         <AddTool addPage={addPage} screenData={screenData} />
         <DelTool delPage={delPage} screenData={screenData} />
         <SaveTool saveData={saveData} />
+        <div></div>
         <button className="palette-resizer" onClick={onCollapse}>
           <img src="./min.svg" alt="minimize palette" />
         </button>

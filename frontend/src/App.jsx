@@ -10,6 +10,7 @@ import {
 } from "./utils";
 import Palette from "./palette/Palette";
 import Pointer from "./Pointer";
+import PageNumber from "./Page";
 
 function App() {
   const boardRef = useRef(null);
@@ -93,6 +94,7 @@ function App() {
         prevPage={prevPage}
         saveData={saveData}
       />
+      <PageNumber screenData={screenData} />
       <Pointer
         toolIdx={modifierIdx}
         colorIdx={colorIdx}

@@ -1,0 +1,14 @@
+#page-number {
+    position: absolute;
+    width: max-content;
+    height: max-content;
+    right: 50px;
+    bottom: 25px;
+    font-size: 1.3rem;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  }

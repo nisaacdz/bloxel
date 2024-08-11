@@ -5,7 +5,7 @@ import React, {
   useRef,
 } from "react";
 import "./Board.css";
-import { BACKGROUNDS, DefaultChalk, DefaultDuster } from "../utils";
+import { BACKGROUNDS, complement, DefaultChalk, DefaultDuster } from "../utils";
 import jsPDF from "jspdf";
 import { CurveInterpolator } from "curve-interpolator";
 
@@ -99,26 +99,30 @@ function interpolate(activeMouseRef, mouseX, mouseY, contextRef, toolIdx) {
   const lastPoint = points[points.length - 1];
 
   const totalSteps = Math.ceil(
-    Math.sqrt(
-      Math.pow(mouseX - lastPoint[0], 2) + Math.pow(mouseY - lastPoint[1], 2)
-    )
+    0.85 *
+      Math.sqrt(
+        Math.pow(mouseX - lastPoint[0], 2) + Math.pow(mouseY - lastPoint[1], 2)
+      )
   );
 
   if (totalSteps === 0) {
     return;
   }
 
+  const step = 1 / totalSteps;
+
   pointQueue.enqueue([mouseX, mouseY]);
 
   const interp = new CurveInterpolator(points, { tension: 0.2, alpha: 0.5 });
 
-  interp.getPoints(totalSteps).forEach((point) => {
+  for (let t = step; t <= 1; t += step) {
+    let point = interp.getPointAt(1 - Math.pow(1 - t, 1.5));
     if (toolIdx === 0) {
       escribe(point[0], point[1], contextRef);
     } else {
       erase(point[0], point[1], contextRef);
     }
-  });
+  }
 }
 
 function save(backgroundColor) {
@@ -253,8 +257,12 @@ const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
 
   const resetBackground = () => {
     const background = BACKGROUNDS[backgroundIdx];
-    const color = `rgb(${background[0]}, ${background[1]}, ${background[2]})`;
-    canvasRef.current.style.backgroundColor = color;
+    const foreground = complement(background);
+
+    const backgroundRGB = `rgb(${background[0]}, ${background[1]}, ${background[2]})`;
+    const foregroundRGB = `rgb(${foreground[0]}, ${foreground[1]}, ${foreground[2]})`;
+    canvasRef.current.style.backgroundColor = backgroundRGB;
+    document.getElementById("page-number").style.color = foregroundRGB;
   };
 
   const clearCanvas = () => {
