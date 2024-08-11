@@ -13,7 +13,6 @@ const SCREENS = [null];
 
 function escribe(mouseX, mouseY, contextRef) {
   const tool = DefaultChalk;
-
   const n = tool.sizeX();
   const m = tool.sizeY();
   const x = mouseX - Math.floor(n / 2);
@@ -30,12 +29,15 @@ function escribe(mouseX, mouseY, contextRef) {
         g2 = data[idx + 1],
         b2 = data[idx + 2],
         a2 = data[idx + 3];
-      const sumA = a1 + a2;
 
-      const r = (r1 * a1 + r2 * a2) / sumA;
-      const g = (g1 * a1 + g2 * a2) / sumA;
-      const b = (b1 * a1 + b2 * a2) / sumA;
-      const a = a1 + Math.round((a2 / 255) * (255 - a1));
+      const f1 = a1 / 255;
+      const f2 = (1 - f1) * (a2 / 255);
+      const sumF = f1 + f2;
+
+      const a = 255 - ((255 - a1) * (255 - a2)) / 255;
+      const r = (r1 * f1 + r2 * f2) / sumF;
+      const g = (g1 * f1 + g2 * f2) / sumF;
+      const b = (b1 * f1 + b2 * f2) / sumF;
 
       data[idx] = r;
       data[idx + 1] = g;
@@ -76,38 +78,6 @@ class PointQueue {
   }
 }
 
-function linearInterpolate(points, mouseX, mouseY, contextRef, toolIdx) {
-  const step = 1;
-  if (points.length === 0) {
-    if (toolIdx === 0) {
-      escribe(mouseX, mouseY, contextRef);
-    } else {
-      erase(mouseX, mouseY, contextRef);
-    }
-  } else {
-    const [prevX, prevY] = points[0];
-    const dx = mouseX - prevX;
-    const dy = mouseY - prevY;
-
-    const steps = Math.max(Math.abs(dx), Math.abs(dy)) / step;
-
-    if (steps !== 0) {
-      const xIncrement = dx / steps;
-      const yIncrement = dy / steps;
-
-      for (let i = 0; i <= steps; i++) {
-        const x = Math.round(prevX + xIncrement * i);
-        const y = Math.round(prevY + yIncrement * i);
-        if (toolIdx === 0) {
-          escribe(x, y, contextRef);
-        } else {
-          erase(x, y, contextRef);
-        }
-      }
-    }
-  }
-}
-
 function interpolate(activeMouseRef, mouseX, mouseY, contextRef, toolIdx) {
   if (!activeMouseRef.current) {
     activeMouseRef.current = new PointQueue();
@@ -129,10 +99,9 @@ function interpolate(activeMouseRef, mouseX, mouseY, contextRef, toolIdx) {
   const lastPoint = points[points.length - 1];
 
   const totalSteps = Math.ceil(
-    1.1 *
-      Math.sqrt(
-        Math.pow(mouseX - lastPoint[0], 2) + Math.pow(mouseY - lastPoint[1], 2)
-      )
+    Math.sqrt(
+      Math.pow(mouseX - lastPoint[0], 2) + Math.pow(mouseY - lastPoint[1], 2)
+    )
   );
 
   if (totalSteps === 0) {
