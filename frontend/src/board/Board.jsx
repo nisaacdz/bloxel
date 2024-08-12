@@ -98,29 +98,30 @@ function interpolate(activeMouseRef, mouseX, mouseY, contextRef, toolIdx) {
 
   const lastPoint = points[points.length - 1];
 
-  const totalSteps = Math.ceil(
-    0.85 *
-      Math.sqrt(
-        Math.pow(mouseX - lastPoint[0], 2) + Math.pow(mouseY - lastPoint[1], 2)
-      )
-  );
+  const diffX = mouseX - lastPoint[0];
+  const diffY = mouseY - lastPoint[1];
+
+  const totalSteps = Math.max(Math.abs(diffX), Math.abs(diffY));
 
   if (totalSteps === 0) {
     return;
   }
 
-  const step = 1 / totalSteps;
-
   pointQueue.enqueue([mouseX, mouseY]);
+
+  const stepX = diffX / totalSteps;
+  const stepY = diffY / totalSteps;
 
   const interp = new CurveInterpolator(points, { tension: 0.2, alpha: 0.5 });
 
-  for (let t = step; t <= 1; t += step) {
-    let point = interp.getPointAt(1 - Math.pow(1 - t, 1.5));
+  for (let s = 1; s <= totalSteps; s += 1) {
+    const pX = lastPoint[0] + s * stepX;
+    const pY = lastPoint[1] + s * stepY;
+    const point = interp.getNearestPosition([pX, pY]).point;
     if (toolIdx === 0) {
-      escribe(point[0], point[1], contextRef);
+      escribe(Math.round(point[0]), Math.round(point[1]), contextRef);
     } else {
-      erase(point[0], point[1], contextRef);
+      erase(Math.round(point[0]), Math.round(point[1]), contextRef);
     }
   }
 }
