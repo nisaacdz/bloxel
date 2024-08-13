@@ -10,9 +10,6 @@ import {
   complement,
   DefaultChalk,
   DefaultDuster,
-  DEFAULT_CHALK_COLOR,
-  DEFAULT_BACKGROUND,
-  DEFAULT_CHALK_DESIGN,
 } from "../utils";
 import jsPDF from "jspdf";
 import { CurveInterpolator } from "curve-interpolator";

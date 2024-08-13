@@ -454,7 +454,7 @@ class Duster {
   }
 
   idx_ptr(x, y) {
-    if (x < 2 || x >= this.sizeY() - 2 || y < 2 || y >= this.sizeX() - 2) {
+    if (x < 3 || x >= this.sizeY() - 3 || y < 3 || y >= this.sizeX() - 3) {
       return complement(this.color());
     } else {
       return this.color();
@@ -472,7 +472,10 @@ class Duster {
 
 export function complement(color) {
   const [r, g, b, a] = color;
-  return [255 - r, 255 - g, 255 - b, a];
+  const nr = r + 127 <= 255 ? r + 127 : r - 128;
+  const ng = g + 127 <= 255 ? g + 127 : g - 128;
+  const nb = b + 127 <= 255 ? b + 127 : b - 128;
+  return [nr, ng, nb, a];
 }
 
 export const DefaultDuster = new Duster(DEFAULT_BACKGROUND);

@@ -114,6 +114,11 @@ const Palette = forwardRef(
       dragOffset.current = { x: 0, y: 0 };
     };
 
+    const handleDragLeave = (event) => {
+      //TODO
+      event.preventDefault();
+    };
+
     const reposition = () => {
       const maxY = window.innerHeight - size.current.height;
       const maxX = window.innerWidth - size.current.width;
@@ -143,7 +148,11 @@ const Palette = forwardRef(
         y: window.innerHeight - size.current.height - 15,
       };
 
-      if ((window.innerWidth < 665 || window.innerHeight < 50) && !collapsed) {
+      if (
+        (window.innerWidth < size.height + 5 ||
+          window.innerHeight < size.current.height + 5) &&
+        !collapsed
+      ) {
         setCollapsed(true);
       } else {
         container.current.style.transform = `translate(${position.current.x}px, ${position.current.y}px)`;
@@ -166,8 +175,12 @@ const Palette = forwardRef(
           onDragStart={handleDragStart}
           onDrag={handleDrag}
           onDragEnd={handleDragEnd}
+          onDragLeave={handleDragLeave}
           ref={container}
           onClick={(event) => event.stopPropagation()}
+          style={{
+            transform: `translate(${position.current.x}px, ${position.current.y}px)`,
+          }}
         >
           <button className="palette-resizer" onClick={onExpand}>
             <img src="./max.svg" alt="maximize palette" />
@@ -175,7 +188,7 @@ const Palette = forwardRef(
         </div>
       );
     }
-    
+
     let contents;
     if (paletteIdx === 0) {
       contents = (
@@ -211,7 +224,7 @@ const Palette = forwardRef(
           <NextTool nextPage={nextPage} screenData={screenData} />
           <AddTool addPage={addPage} screenData={screenData} />
           <DelTool delPage={delPage} screenData={screenData} />
-          <ResetTool handleReset={handleReset}/>
+          <ResetTool handleReset={handleReset} />
           <SettingsTool />
           <SaveTool saveData={saveData} />
           <button className="palette-resizer" onClick={onCollapse}>
@@ -220,7 +233,7 @@ const Palette = forwardRef(
         </>
       );
     } else {
-      alert("Something is wrong; restart the program to fix it!");
+      setPaletteIdx(0);
     }
 
     return (
@@ -230,6 +243,7 @@ const Palette = forwardRef(
         onDragStart={handleDragStart}
         onDrag={handleDrag}
         onDragEnd={handleDragEnd}
+        onDragLeave={handleDragLeave}
         ref={container}
         style={{
           transform: `translate(${position.current.x}px, ${position.current.y}px)`,

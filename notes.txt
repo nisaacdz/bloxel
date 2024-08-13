@@ -1,2 +1,10 @@
-chalk particles dispersing onto the sheet
-chalk sensations - (sound + vibrations if possible)
+Add the following to the allowlist in tauri.config.json
+
+"dialog": {
+        "all": false,
+        "ask": false,
+        "confirm": true,
+        "message": false,
+        "open": false,
+        "save": true
+      },
