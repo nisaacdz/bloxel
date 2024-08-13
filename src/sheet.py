@@ -94,8 +94,8 @@ class BloxelBoard:
 
 
 
-color1 = 65, 72, 205
-color2 = 255, 255, 255
+color2 = 65, 72, 205
+color1 = 255, 255, 255
 
 
 def merge_bases(val1: int, val2: int) -> tuple[int, int, int]:
@@ -107,11 +107,11 @@ def merge_bases(val1: int, val2: int) -> tuple[int, int, int]:
     return red, green, blue
 
 
-trace = [[(0,0,0,0) for _ in range(0, 10)] for _ in range(0, 10)]
+trace = [[(0,0,0,0) for _ in range(0, 9)] for _ in range(0, 9)]
 
 midi = len(trace) // 2
 midj = len(trace[0]) // 2
-max_dist = max(midi, midj)**2
+max_dist = max(midj, midj)**2
 
 # for i in range(0, len(trace)):
 #     for j in range(0, len(trace[0])):
@@ -133,10 +133,10 @@ max_dist = max(midi, midj)**2
 
 for i in range(0, len(trace)):
     for j in range(0, len(trace[0])):
-        dist = abs(midi - i)**2 + abs(midj - j)**2
-        alpha = min(max(0, int(255 - 255 * dist / max_dist)), 255)
-        red, green, blue = color1
-        trace[i][j] = red, green, blue, alpha
+        dist = min(max(abs(midi - i)**2 + abs(midj - j)**2, 0), max_dist)
+        alpha = 255 - 255 * dist / max_dist
+        red, green, blue = merge_bases(dist, (max_dist - dist))
+        trace[i][j] = round(red), round(green), round(blue), round(alpha)
         
 
 print(trace)
@@ -153,4 +153,4 @@ board.draw(chalk.overpad, (120, 240))
 for j in range(200, 360):
     board.draw(chalk.overpad, (j, 240))
     
-board.save('temp_sheet3.png')
+board.save('temp_sheet4.png')

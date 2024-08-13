@@ -1,6 +1,6 @@
-const DEFAULT_BACKGROUND = [50, 50, 50, 255];
-const DEFAULT_CHALK_COLOR = [65, 72, 205];
-const DEFAULT_CHALK_TRACE = [
+export const DEFAULT_BACKGROUND = [50, 50, 50, 255];
+export const DEFAULT_CHALK_COLOR = [65, 72, 205];
+const DOUBLE_LINE_CHALK_TRACE = [
   [
     [255, 255, 255, 0],
     [255, 255, 255, 0],
@@ -123,7 +123,7 @@ const DEFAULT_CHALK_TRACE = [
   ],
 ];
 
-const SOLID_CHALK_TRACE = [
+export const DEFAULT_CHALK_DESIGN = [
   [
     [65, 72, 205, 0],
     [65, 72, 205, 0],
@@ -246,6 +246,108 @@ const SOLID_CHALK_TRACE = [
   ],
 ];
 
+const MIDLINE_CHALK_TRACE = [
+  [
+    [255, 255, 255, 0],
+    [255, 255, 255, 0],
+    [255, 255, 255, 0],
+    [255, 255, 255, 0],
+    [255, 255, 255, 0],
+    [255, 255, 255, 0],
+    [255, 255, 255, 0],
+    [255, 255, 255, 0],
+    [255, 255, 255, 0],
+  ],
+  [
+    [255, 255, 255, 0],
+    [255, 255, 255, 0],
+    [219, 220, 245, 48],
+    [183, 186, 236, 96],
+    [171, 174, 233, 112],
+    [183, 186, 236, 96],
+    [219, 220, 245, 48],
+    [255, 255, 255, 0],
+    [255, 255, 255, 0],
+  ],
+  [
+    [255, 255, 255, 0],
+    [219, 220, 245, 48],
+    [160, 163, 230, 128],
+    [124, 129, 220, 175],
+    [112, 117, 217, 191],
+    [124, 129, 220, 175],
+    [160, 163, 230, 128],
+    [219, 220, 245, 48],
+    [255, 255, 255, 0],
+  ],
+  [
+    [255, 255, 255, 0],
+    [183, 186, 236, 96],
+    [124, 129, 220, 175],
+    [88, 94, 211, 223],
+    [76, 83, 208, 239],
+    [88, 94, 211, 223],
+    [124, 129, 220, 175],
+    [183, 186, 236, 96],
+    [255, 255, 255, 0],
+  ],
+  [
+    [255, 255, 255, 0],
+    [171, 174, 233, 112],
+    [112, 117, 217, 191],
+    [76, 83, 208, 239],
+    [65, 72, 205, 255],
+    [76, 83, 208, 239],
+    [112, 117, 217, 191],
+    [171, 174, 233, 112],
+    [255, 255, 255, 0],
+  ],
+  [
+    [255, 255, 255, 0],
+    [183, 186, 236, 96],
+    [124, 129, 220, 175],
+    [88, 94, 211, 223],
+    [76, 83, 208, 239],
+    [88, 94, 211, 223],
+    [124, 129, 220, 175],
+    [183, 186, 236, 96],
+    [255, 255, 255, 0],
+  ],
+  [
+    [255, 255, 255, 0],
+    [219, 220, 245, 48],
+    [160, 163, 230, 128],
+    [124, 129, 220, 175],
+    [112, 117, 217, 191],
+    [124, 129, 220, 175],
+    [160, 163, 230, 128],
+    [219, 220, 245, 48],
+    [255, 255, 255, 0],
+  ],
+  [
+    [255, 255, 255, 0],
+    [255, 255, 255, 0],
+    [219, 220, 245, 48],
+    [183, 186, 236, 96],
+    [171, 174, 233, 112],
+    [183, 186, 236, 96],
+    [219, 220, 245, 48],
+    [255, 255, 255, 0],
+    [255, 255, 255, 0],
+  ],
+  [
+    [255, 255, 255, 0],
+    [255, 255, 255, 0],
+    [255, 255, 255, 0],
+    [255, 255, 255, 0],
+    [255, 255, 255, 0],
+    [255, 255, 255, 0],
+    [255, 255, 255, 0],
+    [255, 255, 255, 0],
+    [255, 255, 255, 0],
+  ],
+];
+
 /// Takes three color components and returns a fourth value that is as similar to the third as the first is similar to the second
 /// Without overflowing the rgb boundaries 0-255
 function translate(cur, sim, end) {
@@ -254,11 +356,11 @@ function translate(cur, sim, end) {
   } else if (cur > sim) {
     // sim is guaranteed to not be equal to 255 because one of the other two conditions would have been triggered instead!
     // const diff_ratio = (cur - sim) / (255 - sim)
-    return end + Math.floor(((255 - end) * (cur - sim)) / (255 - sim));
+    return end + Math.round(((255 - end) * (cur - sim)) / (255 - sim));
   } else {
     // sim is guaranteed to not be equal to zero because one of the above conditions would have been triggered instead!
     // const diff = (sim - cur) / sim;
-    return end - Math.ceil((end * (sim - cur)) / sim);
+    return end - Math.round((end * (sim - cur)) / sim);
   }
 }
 
@@ -326,7 +428,11 @@ export const BACKGROUNDS = [
   [190, 120, 120, 255],
 ];
 
-export const DESIGNS = [SOLID_CHALK_TRACE, DEFAULT_CHALK_TRACE];
+export const DESIGNS = [
+  DEFAULT_CHALK_DESIGN,
+  DOUBLE_LINE_CHALK_TRACE,
+  MIDLINE_CHALK_TRACE,
+];
 
 export const DefaultChalk = new Chalk(DESIGNS[0], COLORS[0]);
 

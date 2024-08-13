@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import Board from "./board/Board";
 import {
@@ -11,6 +11,7 @@ import {
 import Palette from "./palette/Palette";
 import Pointer from "./Pointer";
 import PageNumber from "./Page";
+import { appWindow } from "@tauri-apps/api/window";
 
 function App() {
   const boardRef = useRef(null);
@@ -20,6 +21,13 @@ function App() {
   const [colorIdx, setColorIdx] = useState(0);
   const [backgroundIdx, setBackgroundIdx] = useState(0);
   const [designIdx, setDesignIdx] = useState(0);
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [screenData]);
 
   const updateBackgroundIdx = (idx) => {
     DefaultDuster.changeBackground(BACKGROUNDS[idx]);
@@ -64,10 +72,44 @@ function App() {
     boardRef.current.saveData();
   };
 
+  const handleReset = () => {
+    if (confirm("Are you sure you want to start a new session?")) {
+      setScreenData(boardRef.current.reset());
+      setBackgroundIdx(0);
+      setColorIdx(0);
+      setDesignIdx(0);
+    }
+  };
+
   const withinDrawingZone = (x, y) => {
     return (
       boardRef.current.withinRect(x, y) && !paletteRef.current.withinRect(x, y)
     );
+  };
+
+  const handleKeyDown = async (event) => {
+    const code = event.keyCode;
+    if (code == 70 || code == 102) {
+      appWindow.setFullscreen(true);
+    } else if (code == 27) {
+      appWindow.setFullscreen(false);
+    } else if (code == 13) {
+      appWindow
+        .isFullscreen()
+        .then(async (value) => await appWindow.setFullscreen(!value));
+    } else if (code == 37) {
+      if (screenData.idx > 0) {
+        prevPage();
+      } else {
+        //
+      }
+    } else if (code == 39) {
+      if (screenData.idx + 1 < screenData.size) {
+        nextPage();
+      } else {
+        addPage();
+      }
+    }
   };
 
   return (
@@ -93,6 +135,7 @@ function App() {
         nextPage={nextPage}
         prevPage={prevPage}
         saveData={saveData}
+        handleReset={handleReset}
       />
       <PageNumber screenData={screenData} />
       <Pointer

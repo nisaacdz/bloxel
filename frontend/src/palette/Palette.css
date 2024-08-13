@@ -6,7 +6,8 @@
   align-items: center;
   gap: 2px;
   justify-content: center;
-  background-color: rgb(90, 95, 100);
+  background-color: rgb(80, 90, 100);
+  z-index: 99;
 }
 
 #palette-collapsed {
@@ -14,6 +15,7 @@
   width: 44px;
   height: 32px;
   background-color: white;
+  z-index: 99;
 }
 
 .palette-resizer {

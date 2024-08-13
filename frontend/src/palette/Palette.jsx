@@ -1,5 +1,6 @@
 import React, {
   forwardRef,
+  useEffect,
   useImperativeHandle,
   useRef,
   useState,
@@ -14,6 +15,10 @@ import AddTool from "./tools/Add";
 import DelTool from "./tools/Del";
 import Background from "./tools/large/Background";
 import SaveTool from "./tools/save";
+import SlideLeft from "./tools/Left";
+import SlideRight from "./tools/Right";
+import ResetTool from "./tools/Reset";
+import SettingsTool from "./tools/Settings";
 
 const Palette = forwardRef(
   (
@@ -32,10 +37,12 @@ const Palette = forwardRef(
       nextPage,
       prevPage,
       saveData,
+      handleReset,
     },
     ref
   ) => {
     const [collapsed, setCollapsed] = useState(false);
+    const [paletteIdx, setPaletteIdx] = useState(0);
     const container = useRef(null);
     const size = useRef({ width: 660, height: 44 });
     const position = useRef({
@@ -43,6 +50,13 @@ const Palette = forwardRef(
       y: window.innerHeight - size.current.height - 5,
     });
     const dragOffset = useRef({ x: 0, y: 0 });
+
+    useEffect(() => {
+      window.addEventListener("resize", onresize);
+      return () => {
+        window.removeEventListener("resize", onresize);
+      };
+    }, []);
 
     useImperativeHandle(
       ref,
@@ -87,6 +101,11 @@ const Palette = forwardRef(
         y: Math.min(Math.max(0, posY), maxY),
       };
 
+      dragOffset.current = {
+        x: event.clientX - position.current.x,
+        y: event.clientY - position.current.y,
+      };
+
       container.current.style.transform = `translate(${position.current.x}px, ${position.current.y}px)`;
     };
 
@@ -106,7 +125,6 @@ const Palette = forwardRef(
     };
 
     const onCollapse = (event) => {
-      //event.stopPropagation();
       size.current = { width: 60, height: 32 };
       reposition();
       setCollapsed(true);
@@ -119,6 +137,27 @@ const Palette = forwardRef(
       setCollapsed(false);
     };
 
+    const onresize = (event) => {
+      position.current = {
+        x: (window.innerWidth - size.current.width) / 2,
+        y: window.innerHeight - size.current.height - 15,
+      };
+
+      if ((window.innerWidth < 665 || window.innerHeight < 50) && !collapsed) {
+        setCollapsed(true);
+      } else {
+        container.current.style.transform = `translate(${position.current.x}px, ${position.current.y}px)`;
+      }
+    };
+
+    const handleSlideLeft = () => {
+      setPaletteIdx(0);
+    };
+
+    const handleSlideRight = () => {
+      setPaletteIdx(1);
+    };
+
     if (collapsed) {
       return (
         <div
@@ -128,9 +167,6 @@ const Palette = forwardRef(
           onDrag={handleDrag}
           onDragEnd={handleDragEnd}
           ref={container}
-          style={{
-            transform: `translate(${position.current.x}px, ${position.current.y}px)`,
-          }}
           onClick={(event) => event.stopPropagation()}
         >
           <button className="palette-resizer" onClick={onExpand}>
@@ -138,6 +174,53 @@ const Palette = forwardRef(
           </button>
         </div>
       );
+    }
+    
+    let contents;
+    if (paletteIdx === 0) {
+      contents = (
+        <>
+          <Background
+            backgroundIdx={backgroundIdx}
+            updateBackgroundIdx={updateBackgroundIdx}
+          />
+          <ChalkTool
+            colorIdx={colorIdx}
+            updateColorIdx={updateColorIdx}
+            designIdx={designIdx}
+            updateDesignIdx={updateDesignIdx}
+            updateActiveTool={updateActiveTool}
+          />
+          <DusterTool updateActiveTool={updateActiveTool} />
+          <ClearTool clearDrawingBoard={clearDrawingBoard} />
+          <PrevTool prevPage={prevPage} screenData={screenData} />
+          <NextTool nextPage={nextPage} screenData={screenData} />
+          <AddTool addPage={addPage} screenData={screenData} />
+          <SaveTool saveData={saveData} />
+          <SlideRight onSlideRight={handleSlideRight} />
+          <button className="palette-resizer" onClick={onCollapse}>
+            <img src="./min.svg" alt="minimize palette" />
+          </button>
+        </>
+      );
+    } else if (paletteIdx === 1) {
+      contents = (
+        <>
+          <SlideLeft onSlideLeft={handleSlideLeft} />
+          <PrevTool prevPage={prevPage} screenData={screenData} />
+          <NextTool nextPage={nextPage} screenData={screenData} />
+          <AddTool addPage={addPage} screenData={screenData} />
+          <DelTool delPage={delPage} screenData={screenData} />
+          <ResetTool handleReset={handleReset}/>
+          <SettingsTool />
+          <SaveTool saveData={saveData} />
+          <button className="palette-resizer" onClick={onCollapse}>
+            <img src="./min.svg" alt="minimize palette" />
+          </button>
+        </>
+      );
+    } else {
+      alert("Something is wrong; restart the program to fix it!");
     }
 
     return (
@@ -153,28 +236,7 @@ const Palette = forwardRef(
         }}
         onClick={(event) => event.stopPropagation()}
       >
-        <Background
-          backgroundIdx={backgroundIdx}
-          updateBackgroundIdx={updateBackgroundIdx}
-        />
-        <ChalkTool
-          colorIdx={colorIdx}
-          updateColorIdx={updateColorIdx}
-          designIdx={designIdx}
-          updateDesignIdx={updateDesignIdx}
-          updateActiveTool={updateActiveTool}
-        />
-        <DusterTool updateActiveTool={updateActiveTool} />
-        <ClearTool clearDrawingBoard={clearDrawingBoard} />
-        <PrevTool prevPage={prevPage} screenData={screenData} />
-        <NextTool nextPage={nextPage} screenData={screenData} />
-        <AddTool addPage={addPage} screenData={screenData} />
-        <DelTool delPage={delPage} screenData={screenData} />
-        <SaveTool saveData={saveData} />
-        <div></div>
-        <button className="palette-resizer" onClick={onCollapse}>
-          <img src="./min.svg" alt="minimize palette" />
-        </button>
+        {contents}
       </div>
     );
   }

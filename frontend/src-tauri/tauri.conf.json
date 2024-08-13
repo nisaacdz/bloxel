@@ -15,13 +15,15 @@
       "shell": {
         "all": false,
         "open": true
+      },
+      "window": {
+        "setFullscreen": true
       }
     },
     "windows": [
       {
         "title": "bloxel",
-        "width": 1000,
-        "height": 680,
+        "fullscreen": true,
         "fileDropEnabled": false
       }
     ],

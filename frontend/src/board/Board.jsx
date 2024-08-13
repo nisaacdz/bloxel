@@ -5,7 +5,15 @@ import React, {
   useRef,
 } from "react";
 import "./Board.css";
-import { BACKGROUNDS, complement, DefaultChalk, DefaultDuster } from "../utils";
+import {
+  BACKGROUNDS,
+  complement,
+  DefaultChalk,
+  DefaultDuster,
+  DEFAULT_CHALK_COLOR,
+  DEFAULT_BACKGROUND,
+  DEFAULT_CHALK_DESIGN,
+} from "../utils";
 import jsPDF from "jspdf";
 import { CurveInterpolator } from "curve-interpolator";
 
@@ -228,6 +236,13 @@ const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
         const y2 = y1 + rect.height;
 
         return x >= x1 && y >= y1 && x < x2 && y < y2;
+      },
+      reset: () => {
+        SCREENS.splice(0, SCREENS.length);
+        SCREENS.push(null);
+        console.log(SCREENS.length);
+        loadScreenAt(0);
+        return { idx: 0, size: SCREENS.length };
       },
     }),
     [backgroundIdx]
