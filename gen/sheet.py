@@ -112,16 +112,16 @@ trace = [[(0,0,0,0) for _ in range(0, 9)] for _ in range(0, 9)]
 
 midi = len(trace) // 2
 midj = len(trace[0]) // 2
-max_dist = max(midj, midj)
+max_dist = max(midj + 1, midj + 1)
 
 for i in range(0, len(trace)):
     for j in range(0, len(trace[0])):
         dist = math.sqrt(abs(midi - i)**2 + abs(midj - j)**2)
-        alpha = 255 - 255 * dist / max_dist
-        red, green, blue = merge_bases(dist, (max_dist - dist))
+        alpha = 0
+        if dist < 5:
+            alpha = round(255 - (255 * dist) / max_dist) 
+        red, green, blue = merge_bases(dist**2, max(6 - dist, 0)**2)
         trace[i][j] = round(red), round(green), round(blue), round(alpha)
-        
-
 print(trace)
 
 background = (50, 50, 50)
