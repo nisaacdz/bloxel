@@ -72,7 +72,7 @@ class PointQueue {
   }
 
   enqueue(point) {
-    if (this.queue.length >= this.maxSize) {
+    while (this.queue.length >= this.maxSize) {
       this.queue.shift();
     }
     this.queue.push(point);
@@ -117,7 +117,7 @@ function interpolate(activeMouseRef, mouseX, mouseY, contextRef, toolIdx) {
   const stepX = diffX / totalSteps;
   const stepY = diffY / totalSteps;
 
-  const interp = new CurveInterpolator(points, { tension: 0.2, alpha: 0.5 });
+  const interp = new CurveInterpolator(pointQueue.getQueue(), { tension: 0.2, alpha: 0.5 });
 
   for (let s = 1; s <= totalSteps; s += 1) {
     const pX = lastPoint[0] + s * stepX;
