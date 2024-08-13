@@ -1,4 +1,5 @@
 from PIL import Image
+import math
     
 class OverPad:
     """
@@ -111,29 +112,11 @@ trace = [[(0,0,0,0) for _ in range(0, 9)] for _ in range(0, 9)]
 
 midi = len(trace) // 2
 midj = len(trace[0]) // 2
-max_dist = max(midj, midj)**2
-
-# for i in range(0, len(trace)):
-#     for j in range(0, len(trace[0])):
-#         dist = abs(midi - i)**2 + abs(midj - j)**2
-#         alpha = min(max(0, int(255 - 255 * dist / max_dist)), 255)
-#         red, green, blue = 255, 255, 255
-#         shift = abs(midj - j)
-#         if shift <= 2:
-#             r = shift
-#             w = 2 - shift
-#             red, green, blue = merge_bases(r**2, w**2)
-#         elif shift <= 4:
-#             r = 4 - shift
-#             w = shift - 2
-#             red, green, blue = merge_bases(r**2, w**2)
-#         else:
-#             red, green, blue = color2
-#         trace[i][j] = red, green, blue, alpha
+max_dist = max(midj, midj)
 
 for i in range(0, len(trace)):
     for j in range(0, len(trace[0])):
-        dist = min(max(abs(midi - i)**2 + abs(midj - j)**2, 0), max_dist)
+        dist = math.sqrt(abs(midi - i)**2 + abs(midj - j)**2)
         alpha = 255 - 255 * dist / max_dist
         red, green, blue = merge_bases(dist, (max_dist - dist))
         trace[i][j] = round(red), round(green), round(blue), round(alpha)

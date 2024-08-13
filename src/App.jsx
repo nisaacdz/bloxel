@@ -74,6 +74,8 @@ function App() {
 
   const handleReset = () => {
     if (confirm("Are you sure you want to start a new session?")) {
+      DefaultChalk.changeColor(COLORS[0]);
+      DefaultChalk.changeDesign(DESIGNS[0]);
       setScreenData(boardRef.current.reset());
       setBackgroundIdx(0);
       setColorIdx(0);
