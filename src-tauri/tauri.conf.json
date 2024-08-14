@@ -34,7 +34,7 @@
     },
     "windows": [
       {
-        "title": "bloxel",
+        "title": "bloxel",        
         "fullscreen": true,
         "fileDropEnabled": false,
         "minHeight": 240,
