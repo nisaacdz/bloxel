@@ -1,3 +1,10 @@
+/// This module is thrash and is currently not being used in any way in the bloxel project
+/// It was generated as part of the original designs but was abondoned in favor of the HTML canvas api
+/// which is currently being used though react + javascript
+///
+/// In the future we might move computationally expensive operations to this module and call it at the frontend
+/// `tauri` comands.
+
 use board::BloxelBoard;
 
 pub mod board;

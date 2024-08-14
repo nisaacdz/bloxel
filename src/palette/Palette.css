@@ -4,10 +4,11 @@
   width: 660px;
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 5px;
   justify-content: center;
   background-color: rgb(80, 90, 100);
   z-index: 99;
+  border-radius: 5px;
 }
 
 #palette-collapsed {
@@ -16,15 +17,18 @@
   height: 32px;
   background-color: white;
   z-index: 99;
+  border-radius: 5px;
 }
 
 .palette-resizer {
   width: 32px;
   height: 32px;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
+  transition: transform 300ms ease-in;
 }
 
 .palette-resizer img {
@@ -32,8 +36,16 @@
   height: 24px;
 }
 
+.palette-resizer.expand:hover img {
+  transform: scale(1.3);
+}
+
+.palette-resizer.collapse:hover img {
+  transform: scale(0.75);
+}
+
 .simple-btn {
-  width: 40px;
+  width: 36px;
   height: 36px;
   display: flex;
   justify-content: center;
@@ -41,6 +53,17 @@
   border: 1px solid darkgray;
   background-color: transparent;
   box-sizing: border-box;
+  border-radius: 5px;
+}
+
+.simple-btn.active:hover img {
+  transform: scale(1.2);
+  transition: transform 300ms ease-in-out;
+}
+
+.simple-btn.active:active {
+  background-color: darkolivegreen;
+  border-color: black;
 }
 
 .simple-btn.active {
@@ -48,8 +71,8 @@
   border-color: white;
 }
 
-.simple-btn.active:hover {
-  background-color: antiquewhite;
+.simple-btn.active:hover:not(:active) {
+  background-color: rgb(102, 102, 102);
 }
 
 .tool-img {

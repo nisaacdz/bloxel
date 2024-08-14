@@ -6,7 +6,8 @@
   height: 42px;
   width: 165px;
   border: 1px solid white;
-  gap: 2px;
+  gap: 3px;
+  border-radius: 5px;
 }
 
 #chalk-tool:active {
@@ -20,7 +21,7 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 3px;
 }
 
 .chalk-design {
@@ -34,7 +35,7 @@
 }
 
 .chalk-color {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
 }

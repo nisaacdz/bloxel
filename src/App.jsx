@@ -72,8 +72,8 @@ function App() {
     boardRef.current.saveData();
   };
 
-  const handleReset = () => {
-    if (confirm("Are you sure you want to start a new session?")) {
+  const handleReset = async () => {
+    if (await confirm("Are you sure you want to start a new session?")) {
       DefaultChalk.changeColor(COLORS[0]);
       DefaultChalk.changeDesign(DESIGNS[0]);
       setScreenData(boardRef.current.reset());

@@ -20,6 +20,9 @@ import SlideRight from "./tools/Right";
 import ResetTool from "./tools/Reset";
 import SettingsTool from "./tools/Settings";
 
+const fullSize = { width: 660, height: 44 };
+const collapsedSize = { width: 60, height: 32 };
+
 const Palette = forwardRef(
   (
     {
@@ -44,10 +47,10 @@ const Palette = forwardRef(
     const [collapsed, setCollapsed] = useState(false);
     const [paletteIdx, setPaletteIdx] = useState(0);
     const container = useRef(null);
-    const size = useRef({ width: 660, height: 44 });
+    const size = useRef(fullSize);
     const position = useRef({
       x: (window.innerWidth - size.current.width) / 2,
-      y: window.innerHeight - size.current.height - 5,
+      y: window.innerHeight - size.current.height - 15,
     });
     const dragOffset = useRef({ x: 0, y: 0 });
 
@@ -75,7 +78,6 @@ const Palette = forwardRef(
     );
 
     const handleDragStart = (event) => {
-      event.stopPropagation();
       const rect = container.current.getBoundingClientRect();
       dragOffset.current = {
         x: event.clientX - rect.left,
@@ -109,8 +111,8 @@ const Palette = forwardRef(
       container.current.style.transform = `translate(${position.current.x}px, ${position.current.y}px)`;
     };
 
-    const handleDragEnd = () => {
-      // Reset drag offset
+    const handleDragEnd = (event) => {
+      event.preventDefault();
       dragOffset.current = { x: 0, y: 0 };
     };
 
@@ -130,14 +132,13 @@ const Palette = forwardRef(
     };
 
     const onCollapse = (event) => {
-      size.current = { width: 60, height: 32 };
+      size.current = collapsedSize;
       reposition();
       setCollapsed(true);
     };
 
     const onExpand = (event) => {
-      event.stopPropagation();
-      size.current = { width: 660, height: 44 };
+      size.current = fullSize;
       reposition();
       setCollapsed(false);
     };
@@ -149,11 +150,11 @@ const Palette = forwardRef(
       };
 
       if (
-        (window.innerWidth < size.height + 5 ||
+        (window.innerWidth < size.current.width + 5 ||
           window.innerHeight < size.current.height + 5) &&
         !collapsed
       ) {
-        setCollapsed(true);
+        onCollapse(event);
       } else {
         container.current.style.transform = `translate(${position.current.x}px, ${position.current.y}px)`;
       }
@@ -182,7 +183,7 @@ const Palette = forwardRef(
             transform: `translate(${position.current.x}px, ${position.current.y}px)`,
           }}
         >
-          <button className="palette-resizer" onClick={onExpand}>
+          <button className="palette-resizer expand" onClick={onExpand}>
             <img src="./max.svg" alt="maximize palette" />
           </button>
         </div>
@@ -211,7 +212,7 @@ const Palette = forwardRef(
           <AddTool addPage={addPage} screenData={screenData} />
           <SaveTool saveData={saveData} />
           <SlideRight onSlideRight={handleSlideRight} />
-          <button className="palette-resizer" onClick={onCollapse}>
+          <button className="palette-resizer collapse" onClick={onCollapse}>
             <img src="./min.svg" alt="minimize palette" />
           </button>
         </>
@@ -227,12 +228,13 @@ const Palette = forwardRef(
           <ResetTool handleReset={handleReset} />
           <SettingsTool />
           <SaveTool saveData={saveData} />
-          <button className="palette-resizer" onClick={onCollapse}>
+          <button className="palette-resizer collapse" onClick={onCollapse}>
             <img src="./min.svg" alt="minimize palette" />
           </button>
         </>
       );
     } else {
+      // Shouldn't be reached! I am putting this here just in case!
       setPaletteIdx(0);
     }
 

@@ -123,7 +123,7 @@ const DOUBLE_LINE_CHALK_TRACE = [
   ],
 ];
 
-export const DEFAULT_CHALK_DESIGN = [
+const SOLID_CHALK_TRACE = [
   [
     [65, 72, 205, 0],
     [65, 72, 205, 0],
@@ -423,15 +423,15 @@ export const COLORS = [
 export const BACKGROUNDS = [
   [50, 50, 50, 255],
   [255, 255, 255, 255],
-  [90, 190, 120, 255],
-  [60, 60, 190, 255],
-  [190, 120, 120, 255],
+  [120, 180, 120, 255],
+  [120, 120, 180, 255],
+  [180, 120, 120, 255],
 ];
 
 export const DESIGNS = [
-  DEFAULT_CHALK_DESIGN,
-  DOUBLE_LINE_CHALK_TRACE,
   MIDLINE_CHALK_TRACE,
+  SOLID_CHALK_TRACE,
+  DOUBLE_LINE_CHALK_TRACE,
 ];
 
 export const DefaultChalk = new Chalk(DESIGNS[0], COLORS[0]);

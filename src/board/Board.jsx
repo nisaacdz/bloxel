@@ -237,7 +237,6 @@ const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
       reset: () => {
         SCREENS.splice(0, SCREENS.length);
         SCREENS.push(null);
-        console.log(SCREENS.length);
         loadScreenAt(0);
         return { idx: 0, size: SCREENS.length };
       },

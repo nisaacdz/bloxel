@@ -6,11 +6,12 @@
     width: 150px;
     border: 1px solid white;
     gap: 5px;
+    border-radius: 5px;
 }
 
 .background-preview {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
 }
 
 .background-preview.active {

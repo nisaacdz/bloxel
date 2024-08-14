@@ -2,8 +2,9 @@
     position: absolute;
     width: max-content;
     height: max-content;
-    right: 30px;
+    right: 20px;
     top: 20px;
+    opacity: 0.5;
     font-size: 1.2rem;
     font-weight: 900;
     display: flex;
@@ -11,4 +12,5 @@
     justify-content: center;
     pointer-events: none;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    user-select: none;
   }
