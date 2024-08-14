@@ -5,14 +5,11 @@ import React, {
   useRef,
 } from "react";
 import "./Board.css";
-import {
-  BACKGROUNDS,
-  complement,
-  DefaultChalk,
-  DefaultDuster,
-} from "../utils";
+import { BACKGROUNDS, complement, DefaultChalk, DefaultDuster } from "../utils";
 import jsPDF from "jspdf";
 import { CurveInterpolator } from "curve-interpolator";
+import { save } from "@tauri-apps/api/dialog";
+import { writeBinaryFile } from "@tauri-apps/api/fs";
 
 const SCREENS = [null];
 
@@ -117,7 +114,10 @@ function interpolate(activeMouseRef, mouseX, mouseY, contextRef, toolIdx) {
   const stepX = diffX / totalSteps;
   const stepY = diffY / totalSteps;
 
-  const interp = new CurveInterpolator(pointQueue.getQueue(), { tension: 0.2, alpha: 0.5 });
+  const interp = new CurveInterpolator(pointQueue.getQueue(), {
+    tension: 0.2,
+    alpha: 0.5,
+  });
 
   for (let s = 1; s <= totalSteps; s += 1) {
     const pX = lastPoint[0] + s * stepX;
@@ -131,19 +131,10 @@ function interpolate(activeMouseRef, mouseX, mouseY, contextRef, toolIdx) {
   }
 }
 
-function save(backgroundColor) {
-  let maxWidth = 0;
-  let maxHeight = 0;
-  SCREENS.forEach((screen) => {
-    maxWidth = Math.max(maxWidth, screen.width);
-    maxHeight = Math.max(maxHeight, screen.height);
-  });
-
-  const pdf = new jsPDF({
-    orientation: maxWidth > maxHeight ? "landscape" : "portrait",
-    unit: "px",
-    format: [maxWidth, maxHeight],
-  });
+async function savePDF(backgroundColor) {
+  const pdf = new jsPDF("landscape");
+  const maxWidth = pdf.internal.pageSize.getWidth();
+  const maxHeight = pdf.internal.pageSize.getHeight();
 
   const [r1, g1, b1, _] = backgroundColor;
 
@@ -165,13 +156,42 @@ function save(backgroundColor) {
         screen.data[idx + 3] = 255;
       }
     }
-    const x = (maxWidth - screen.width) / 2;
-    const y = (maxHeight - screen.height) / 2;
+    let dispWidth = screen.width;
+    let dispHeight = screen.height;
+
+    const widthRatio = maxWidth / dispWidth;
+    const heightRatio = maxHeight / dispHeight;
+    const scaleFactor = Math.min(widthRatio, heightRatio);
+
+    if (scaleFactor < 1) {
+      dispWidth *= scaleFactor;
+      dispHeight *= scaleFactor;
+    }
+
+    const x = (maxWidth - dispWidth) / 2;
+    const y = (maxHeight - dispHeight) / 2;
+
     if (index > 0) pdf.addPage();
-    pdf.addImage(screen, "JPEG", x, y, screen.width, screen.height);
+    pdf.addImage(
+      screen,
+      "JPEG",
+      x,
+      y,
+      dispWidth,
+      dispHeight,
+      undefined,
+      "SLOW"
+    );
   });
 
-  pdf.save("screen_data.pdf");
+  const filePath = await save({
+    filters: [{ name: "PDF", extensions: ["pdf"] }],
+  });
+
+  if (filePath) {
+    const pdfData = pdf.output("arraybuffer");
+    await writeBinaryFile({ path: filePath, contents: pdfData });
+  }
 }
 
 const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
@@ -223,7 +243,7 @@ const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
       },
       saveData: () => {
         updateScreensArray();
-        save(BACKGROUNDS[backgroundIdx]);
+        savePDF(BACKGROUNDS[backgroundIdx]);
       },
       withinRect: (x, y) => {
         const rect = canvasRef.current.getBoundingClientRect();

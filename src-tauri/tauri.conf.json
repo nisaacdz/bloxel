@@ -26,6 +26,10 @@
       },
       "window": {
         "setFullscreen": true
+      },
+      "fs": {
+        "all": false,
+        "writeFile": true
       }
     },
     "windows": [
