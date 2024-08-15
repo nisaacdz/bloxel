@@ -83,6 +83,22 @@ function App() {
     }
   };
 
+  const handleRestore = () => {
+    appWindow
+      .isFullscreen()
+      .then(async (value) => await appWindow.setFullscreen(!value));
+  };
+
+  const handleLeave = async () => {
+    if (
+      await confirm(
+        "Are you sure you want to close this app? \nAll unsaved data will be lost!"
+      )
+    ) {
+      await appWindow.close();
+    }
+  };
+
   const withinDrawingZone = (x, y) => {
     return (
       boardRef.current.withinRect(x, y) && !paletteRef.current.withinRect(x, y)
@@ -138,6 +154,8 @@ function App() {
         prevPage={prevPage}
         saveData={saveData}
         handleReset={handleReset}
+        handleLeave={handleLeave}
+        handleRestore={handleRestore}
       />
       <PageNumber screenData={screenData} />
       <Pointer

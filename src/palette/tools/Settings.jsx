@@ -4,7 +4,7 @@ const SettingsTool = ({ }) => {
   return (
     <button
       id="settings-tool"
-      className={"simple-btn active"}
+      className={"simple-btn inactive"}
       title="settings"
     >
       <img

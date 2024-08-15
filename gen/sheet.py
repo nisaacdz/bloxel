@@ -7,7 +7,7 @@ class OverPad:
     For chalks with non-rectangular cross-section, the input matrix should rely on the alpha channel to make relevant parts of the cross-section transparent
     Generally, chalks tend to has circular cross-sectional area with regions around the circumference more transparent than the regions within it.
     """
-    def __init__(self, trace: list[list[tuple[int, int, int, int]]]) -> None:
+    def __init__(self, trace: list[list[list[int]]]) -> None:
         self.trace = trace
     
 class Chalk:
@@ -15,7 +15,7 @@ class Chalk:
         self.overpad = overpad
             
 class Duster:
-    def __init__(self, rectangle: tuple[int, int], color: tuple[int, int, int, int]) -> None:
+    def __init__(self, rectangle: tuple[int, int], color: list[int]) -> None:
         width, height = rectangle
         trace = [[color for _ in range(0, width)] for _ in range(0, height)]
         self.pad = OverPad(trace)
@@ -29,39 +29,9 @@ class SquareTool:
     def __init__(self, chalk: Chalk) -> None:
         self.chalk = chalk
     
-
-class Highlight:
-    def __init__(self, area: list[list[tuple[int, int, int, int]]], pos: tuple[int, int]) -> None:
-        self.area = area
-        self.pos = pos
-    
-    def higlight(self, img: Image.Image):
-        trace = self.pad.trace
-        midi = len(trace) // 2
-        midj = len(trace[0]) // 2
-        x, y = self.pos
-        width, height = img.size
-        for tj in range(0, len(trace)):
-            for ti in range(0, len(trace[0])):
-                r1, g1, b1, a = trace[tj][ti]
-                ni = x + ti - midi
-                nj = y + tj - midj
-                if ni >= 0 and ni < width and nj >= 0 and nj < height:
-                    r2, g2, b2 = self.board.getpixel((ni, nj))
-                    f1 = a / 255
-                    f2 = 1.0 - f1
-                    r = f1 * r1 + f2 * r2
-                    g = f1 * g1 + f2 * g2
-                    b = f1 * b1 + f2 * b2
-                    trace[tj][ti] = img.getpixel((ni, nj))
-                    img.putpixel((ni, nj), (int(r), int(g), int(b)))
-                    
-    def unhighlight(self, img: Image.Image):
-        self.higlight(img)
-    
     
 class BloxelBoard:
-    def __init__(self, size: tuple[int, int], background: tuple[int, int, int]):
+    def __init__(self, size: tuple[int, int], background: list[int]):
         self.background = background
         self.board = Image.new('RGB', size=size, color=background)
     
@@ -77,7 +47,7 @@ class BloxelBoard:
         width, height = self.board.size
         for tj in range(0, len(trace)):
             for ti in range(0, len(trace[0])):
-                r1, g1, b1, a = trace[tj][ti]
+                [r1, g1, b1, a] = trace[tj][ti]
                 ni = x + ti - midi
                 nj = y + tj - midj
                 if ni >= 0 and ni < width and nj >= 0 and nj < height:
@@ -95,33 +65,35 @@ class BloxelBoard:
 
 
 
-color2 = 65, 72, 205
-color1 = 255, 255, 255
+color1 = (65, 72, 205)
+color2 = (255, 255, 255)
 
-
-def merge_bases(val1: int, val2: int) -> tuple[int, int, int]:
+def merge_bases(val1: int, val2: int, color1: tuple, color2: tuple) -> list[int]:
     red1, green1, blue1 = color1
     red2, green2, blue2 = color2
-    red = int((val1*red1 + val2*red2) / (val1 + val2))
-    green = int((val1*green1 + val2*green2) / (val1 + val2))
-    blue = int((val1*blue1 + val2*blue2) / (val1 + val2))
-    return red, green, blue
+    red = int((val1 * red1 + val2 * red2) / (val1 + val2))
+    green = int((val1 * green1 + val2 * green2) / (val1 + val2))
+    blue = int((val1 * blue1 + val2 * blue2) / (val1 + val2))
+    return [red, green, blue]
 
-
-trace = [[(0,0,0,0) for _ in range(0, 9)] for _ in range(0, 9)]
+trace = [[[0, 0, 0, 0] for _ in range(9)] for _ in range(9)]
 
 midi = len(trace) // 2
 midj = len(trace[0]) // 2
-max_dist = max(midj + 1, midj + 1)
+max_dist = math.sqrt(midi**2 + midj**2)
 
-for i in range(0, len(trace)):
-    for j in range(0, len(trace[0])):
-        dist = math.sqrt(abs(midi - i)**2 + abs(midj - j)**2)
+for i in range(len(trace)):
+    for j in range(len(trace[0])):
+        dist = math.sqrt((midi - i)**2 + (midj - j)**2)
         alpha = 0
         if dist < 5:
-            alpha = round(255 - (255 * dist) / max_dist) 
-        red, green, blue = merge_bases(dist**2, max(6 - dist, 0)**2)
-        trace[i][j] = round(red), round(green), round(blue), round(alpha)
+            alpha = round(255 - (255 * dist) / max_dist)
+        if (i + j) % 2 == 0:
+            red, green, blue = color1
+        else:
+            red, green, blue = color2
+        trace[i][j] = [red, green, blue, alpha]
+
 print(trace)
 
 background = (50, 50, 50)
@@ -136,4 +108,4 @@ board.draw(chalk.overpad, (120, 240))
 for j in range(200, 360):
     board.draw(chalk.overpad, (j, 240))
     
-board.save('temp_sheet4.png')
+board.save('temp_sheet5.png')

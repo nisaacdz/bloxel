@@ -25,7 +25,9 @@
         "save": true
       },
       "window": {
-        "setFullscreen": true
+        "all": true,
+        "setFullscreen": true,
+        "close": true
       },
       "fs": {
         "all": false,
@@ -35,10 +37,12 @@
     "windows": [
       {
         "title": "bloxel",        
-        "fullscreen": true,
+        "fullscreen": false,
         "fileDropEnabled": false,
         "minHeight": 240,
-        "minWidth": 360
+        "minWidth": 360,
+        "width": 960,
+        "height": 640
       }
     ],
     "security": {

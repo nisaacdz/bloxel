@@ -19,6 +19,8 @@ import SlideLeft from "./tools/Left";
 import SlideRight from "./tools/Right";
 import ResetTool from "./tools/Reset";
 import SettingsTool from "./tools/Settings";
+import LeaveApp from "./tools/Leave";
+import FullScreen from "./tools/Restore";
 
 const fullSize = { width: 660, height: 44 };
 const collapsedSize = { width: 60, height: 32 };
@@ -41,6 +43,8 @@ const Palette = forwardRef(
       prevPage,
       saveData,
       handleReset,
+      handleLeave,
+      handleRestore,
     },
     ref
   ) => {
@@ -228,6 +232,8 @@ const Palette = forwardRef(
           <ResetTool handleReset={handleReset} />
           <SettingsTool />
           <SaveTool saveData={saveData} />
+          <FullScreen handleRestore={handleRestore}/>
+          <LeaveApp handleLeave={handleLeave}/>
           <button className="palette-resizer collapse" onClick={onCollapse}>
             <img src="./min.svg" alt="minimize palette" />
           </button>
