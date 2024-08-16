@@ -87,6 +87,7 @@ function App() {
       setBackgroundIdx(0);
       setColorIdx(0);
       setDesignIdx(0);
+      setChalkSizeIdx(1);
     }
   };
 
