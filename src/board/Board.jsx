@@ -131,30 +131,29 @@ function interpolate(activeMouseRef, mouseX, mouseY, contextRef, toolIdx) {
   }
 }
 
-async function savePDF(backgroundColor) {
+async function savePDF(context, backgroundColor) {
   const pdf = new jsPDF("landscape");
   const maxWidth = pdf.internal.pageSize.getWidth();
   const maxHeight = pdf.internal.pageSize.getHeight();
 
   const [r1, g1, b1, _] = backgroundColor;
 
-  SCREENS.forEach((screen, index) => {
-    for (let i = 0; i < screen.width; i++) {
-      for (let j = 0; j < screen.height; j++) {
-        const idx = (i * screen.height + j) * 4;
-        const r2 = screen.data[idx];
-        const g2 = screen.data[idx + 1];
-        const b2 = screen.data[idx + 2];
-        const a2 = screen.data[idx + 3];
+  SCREENS.forEach((oldScreen, index) => {
+    const screen = context.createImageData(oldScreen.width, oldScreen.height);
+    for (let i = 0; i < screen.width * screen.height; i++) {
+      const idx = i * 4;
+      const r2 = oldScreen.data[idx];
+      const g2 = oldScreen.data[idx + 1];
+      const b2 = oldScreen.data[idx + 2];
+      const a2 = oldScreen.data[idx + 3];
 
-        const f2 = a2 / 255;
-        const f1 = 1.0 - f2;
+      const f2 = a2 / 255;
+      const f1 = 1.0 - f2;
 
-        screen.data[idx] = Math.floor(f1 * r1 + f2 * r2);
-        screen.data[idx + 1] = Math.floor(f1 * g1 + f2 * g2);
-        screen.data[idx + 2] = Math.floor(f1 * b1 + f2 * b2);
-        screen.data[idx + 3] = 255;
-      }
+      screen.data[idx] = Math.floor(f1 * r1 + f2 * r2);
+      screen.data[idx + 1] = Math.floor(f1 * g1 + f2 * g2);
+      screen.data[idx + 2] = Math.floor(f1 * b1 + f2 * b2);
+      screen.data[idx + 3] = 255;
     }
     let dispWidth = screen.width;
     let dispHeight = screen.height;
@@ -200,16 +199,16 @@ function pasteImage(largeImg, smallImg) {
   const smallerData = smallImg.data;
 
   for (let y = 0; y < smallImg.height; y++) {
-      for (let x = 0; x < smallImg.width; x++) {
-          const largerIndex = (y * largeImg.width + x) * 4;
-          const smallerIndex = (y * smallImg.width + x) * 4;
+    for (let x = 0; x < smallImg.width; x++) {
+      const largerIndex = (y * largeImg.width + x) * 4;
+      const smallerIndex = (y * smallImg.width + x) * 4;
 
-          // Copy RGBA values from smaller image to larger image
-          largerData[largerIndex] = smallerData[smallerIndex];       // Red
-          largerData[largerIndex + 1] = smallerData[smallerIndex + 1]; // Green
-          largerData[largerIndex + 2] = smallerData[smallerIndex + 2]; // Blue
-          largerData[largerIndex + 3] = smallerData[smallerIndex + 3]; // Alpha
-      }
+      // Copy RGBA values from smaller image to larger image
+      largerData[largerIndex] = smallerData[smallerIndex]; // Red
+      largerData[largerIndex + 1] = smallerData[smallerIndex + 1]; // Green
+      largerData[largerIndex + 2] = smallerData[smallerIndex + 2]; // Blue
+      largerData[largerIndex + 3] = smallerData[smallerIndex + 3]; // Alpha
+    }
   }
 }
 
@@ -262,7 +261,7 @@ const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
       },
       saveData: () => {
         updateScreensArray();
-        savePDF(BACKGROUNDS[backgroundIdx]);
+        savePDF(contextRef.current, BACKGROUNDS[backgroundIdx]);
       },
       withinRect: (x, y) => {
         const rect = canvasRef.current.getBoundingClientRect();
@@ -301,7 +300,10 @@ const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
     const context = contextRef.current;
 
     if (!SCREENS[screenIdx.current]) {
-        SCREENS[screenIdx.current] = context.createImageData(screen.width, screen.height);
+      SCREENS[screenIdx.current] = context.createImageData(
+        screen.width,
+        screen.height
+      );
     }
 
     const smallImg = context.getImageData(0, 0, canvas.width, canvas.height);
@@ -309,18 +311,17 @@ const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
     const largeImg = SCREENS[screenIdx.current];
 
     for (let y = 0; y < smallImg.height; y++) {
-        for (let x = 0; x < smallImg.width; x++) {
-            const smallerIndex = (y * smallImg.width + x) * 4;
-            const largerIndex = (y * largeImg.width + x) * 4;
+      for (let x = 0; x < smallImg.width; x++) {
+        const smallerIndex = (y * smallImg.width + x) * 4;
+        const largerIndex = (y * largeImg.width + x) * 4;
 
-            largeImg.data[largerIndex] = smallImg.data[smallerIndex];
-            largeImg.data[largerIndex + 1] = smallImg.data[smallerIndex + 1];
-            largeImg.data[largerIndex + 2] = smallImg.data[smallerIndex + 2];
-            largeImg.data[largerIndex + 3] = smallImg.data[smallerIndex + 3];
-        }
+        largeImg.data[largerIndex] = smallImg.data[smallerIndex];
+        largeImg.data[largerIndex + 1] = smallImg.data[smallerIndex + 1];
+        largeImg.data[largerIndex + 2] = smallImg.data[smallerIndex + 2];
+        largeImg.data[largerIndex + 3] = smallImg.data[smallerIndex + 3];
+      }
     }
-
-};
+  };
 
   const resetBackground = () => {
     const background = BACKGROUNDS[backgroundIdx];
