@@ -10,7 +10,7 @@ const SlideRight = ({ onSlideRight }) => {
     >
       <img
         className="right-tool-img tool-img"
-        src="./right.svg"
+        src="./more.svg"
         alt="right-tool-btn"
       />
     </button>

@@ -10,7 +10,7 @@ const SlideLeft = ({ onSlideLeft }) => {
     >
       <img
         className="left-tool-img tool-img"
-        src="./left.svg"
+        src="./more.svg"
         alt="left-tool-btn"
       />
     </button>
