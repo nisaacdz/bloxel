@@ -81,13 +81,11 @@ function App() {
 
   const handleReset = async () => {
     if (await confirm("Are you sure you want to start a new session?")) {
-      DefaultChalk.changeColor(COLORS[0]);
-      DefaultChalk.changeDesign(DESIGNS[0]);
       setScreenData(boardRef.current.reset());
-      setBackgroundIdx(0);
-      setColorIdx(0);
-      setDesignIdx(0);
-      setChalkSizeIdx(1);
+      updateBackgroundIdx(0);
+      updateColorIdx(0);
+      updateDesignIdx(0);
+      updateChalkSizeIdx(1);
     }
   };
 
