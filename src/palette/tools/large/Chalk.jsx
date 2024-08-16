@@ -54,8 +54,8 @@ const ChalkDesignPreview = ({ active, designIdx, colorIdx, handleClick }) => {
     const ctx = canvas.getContext("2d");
     const chalk = new Chalk(DESIGNS[designIdx], COLORS[colorIdx]);
 
-    const width = chalk.sizeY();
-    const height = chalk.sizeX();
+    const width = chalk.raw_sizeY();
+    const height = chalk.raw_sizeX();
     canvas.width = height;
     canvas.height = width;
 
@@ -64,7 +64,7 @@ const ChalkDesignPreview = ({ active, designIdx, colorIdx, handleClick }) => {
 
     for (let x = 0; x < width; x++) {
       for (let y = 0; y < height; y++) {
-        const [r, g, b, a] = chalk.idx_ptr(x, y);
+        const [r, g, b, a] = chalk.idx_raw(x, y);
         const index = (x * height + y) * 4;
         data[index] = r;
         data[index + 1] = g;

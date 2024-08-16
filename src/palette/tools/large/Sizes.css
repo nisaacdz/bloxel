@@ -1,0 +1,19 @@
+#chalk-sizes {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    height: 35px;
+    width: 120px;
+    border: 1px solid white;
+    border-radius: 5px;
+}
+
+.size-preview {
+    background-color: #BFBFBF;
+    margin: 5px 5px;
+    border-radius: 50%;
+}
+
+.size-preview.active {
+    border: 2px solid black;
+}

@@ -21,6 +21,7 @@ import ResetTool from "./tools/Reset";
 import SettingsTool from "./tools/Settings";
 import LeaveApp from "./tools/Leave";
 import FullScreen from "./tools/Restore";
+import Sizes from "./tools/large/Sizes";
 
 const fullSize = { width: 660, height: 44 };
 const collapsedSize = { width: 60, height: 32 };
@@ -33,8 +34,10 @@ const Palette = forwardRef(
       updateBackgroundIdx,
       colorIdx,
       designIdx,
+      sizeIdx,
       updateColorIdx,
       updateDesignIdx,
+      updateSizeIdx,
       clearDrawingBoard,
       screenData,
       delPage,
@@ -225,6 +228,7 @@ const Palette = forwardRef(
       contents = (
         <>
           <SlideLeft onSlideLeft={handleSlideLeft} />
+          <Sizes sizeIdx={sizeIdx} updateSizeIdx={updateSizeIdx}/>
           <PrevTool prevPage={prevPage} screenData={screenData} />
           <NextTool nextPage={nextPage} screenData={screenData} />
           <AddTool addPage={addPage} screenData={screenData} />

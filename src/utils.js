@@ -450,10 +450,15 @@ export class Chalk {
     this.design = design;
     this.original = DEFAULT_CHALK_COLOR;
     this.newcolor = color;
+    this.scale = 1;
   }
 
   name() {
     return "Chalk";
+  }
+
+  changeScale(newScale) {
+    this.scale = newScale;
   }
 
   changeDesign(newdesign) {
@@ -464,7 +469,9 @@ export class Chalk {
     this.newcolor = newcolor;
   }
 
-  idx(x, y) {
+  idx(pX, pY) {
+    const x = Math.floor(pX / this.scale);
+    const y = Math.floor(pY / this.scale);
     const [curR, curG, curB, a] = this.design[x][y];
     const [simR, simG, simB] = this.original;
     const [endR, endG, endB] = this.newcolor;
@@ -477,17 +484,38 @@ export class Chalk {
     ];
   }
 
+  idx_raw(x, y) {
+    const [curR, curG, curB, a] = this.design[x][y];
+    const [simR, simG, simB] = this.original;
+    const [endR, endG, endB] = this.newcolor;
+
+    return [
+      translate(curR, simR, endR),
+      translate(curG, simG, endG),
+      translate(curB, simB, endB),
+      a,
+    ];
+  }
+
+  raw_sizeX() {
+    return this.design.length;
+  }
+
+  raw_sizeY() {
+    return this.design[0].length;
+  }
+
   idx_ptr(x, y) {
     const [r, g, b, a] = this.idx(x, y);
     return [r, g, b, Math.floor(0.8 * a)];
   }
 
   sizeX() {
-    return this.design.length;
+    return Math.ceil(this.scale * this.design.length);
   }
 
   sizeY() {
-    return this.design[0].length;
+    return Math.ceil(this.scale * this.design[0].length);
   }
 }
 
@@ -561,3 +589,4 @@ export function complement(color) {
 }
 
 export const DefaultDuster = new Duster(DEFAULT_BACKGROUND);
+export const ChalkSizes = [0.5, 1, 2, 3];

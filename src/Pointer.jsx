@@ -5,6 +5,7 @@ import { DefaultChalk, DefaultDuster } from "./utils";
 const Pointer = ({
   colorIdx,
   designIdx,
+  sizeIdx,
   toolIdx,
   backgroundIdx,
   withinDrawingZone,
@@ -42,7 +43,7 @@ const Pointer = ({
     }
 
     ctx.putImageData(imageData, 0, 0);
-  }, [colorIdx, designIdx, toolIdx, backgroundIdx]);
+  }, [colorIdx, designIdx, sizeIdx, toolIdx, backgroundIdx]);
 
   useEffect(() => {
     document.addEventListener("mousemove", handleMouseMove);

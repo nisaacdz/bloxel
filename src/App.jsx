@@ -7,6 +7,7 @@ import {
   DESIGNS,
   BACKGROUNDS,
   DefaultDuster,
+  ChalkSizes,
 } from "./utils";
 import Palette from "./palette/Palette";
 import Pointer from "./Pointer";
@@ -21,6 +22,7 @@ function App() {
   const [colorIdx, setColorIdx] = useState(0);
   const [backgroundIdx, setBackgroundIdx] = useState(0);
   const [designIdx, setDesignIdx] = useState(0);
+  const [chalkSizeIdx, setChalkSizeIdx] = useState(1);
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
@@ -42,6 +44,11 @@ function App() {
   const updateDesignIdx = (idx) => {
     DefaultChalk.changeDesign(DESIGNS[idx]);
     setDesignIdx(idx);
+  };
+
+  const updateChalkSizeIdx = (idx) => {
+    DefaultChalk.changeScale(ChalkSizes[idx]);
+    setChalkSizeIdx(idx);
   };
 
   const updateActiveTool = (idx) => {
@@ -144,8 +151,10 @@ function App() {
         updateBackgroundIdx={updateBackgroundIdx}
         colorIdx={colorIdx}
         designIdx={designIdx}
+        sizeIdx={chalkSizeIdx}
         updateColorIdx={updateColorIdx}
         updateDesignIdx={updateDesignIdx}
+        updateSizeIdx={updateChalkSizeIdx}
         clearDrawingBoard={clearDrawingBoard}
         screenData={screenData}
         delPage={delPage}
@@ -162,6 +171,7 @@ function App() {
         toolIdx={modifierIdx}
         colorIdx={colorIdx}
         designIdx={designIdx}
+        sizeIdx={chalkSizeIdx}
         backgroundIdx={backgroundIdx}
         withinDrawingZone={withinDrawingZone}
       />
