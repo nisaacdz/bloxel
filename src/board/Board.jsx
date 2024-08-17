@@ -193,25 +193,6 @@ async function savePDF(context, backgroundColor) {
   }
 }
 
-// Function to paste smaller image onto larger image at the top-left corner
-function pasteImage(largeImg, smallImg) {
-  const largerData = largeImg.data;
-  const smallerData = smallImg.data;
-
-  for (let y = 0; y < smallImg.height; y++) {
-    for (let x = 0; x < smallImg.width; x++) {
-      const largerIndex = (y * largeImg.width + x) * 4;
-      const smallerIndex = (y * smallImg.width + x) * 4;
-
-      // Copy RGBA values from smaller image to larger image
-      largerData[largerIndex] = smallerData[smallerIndex]; // Red
-      largerData[largerIndex + 1] = smallerData[smallerIndex + 1]; // Green
-      largerData[largerIndex + 2] = smallerData[smallerIndex + 2]; // Blue
-      largerData[largerIndex + 3] = smallerData[smallerIndex + 3]; // Alpha
-    }
-  }
-}
-
 const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
   const activeMouseRef = useRef(null);
   const canvasRef = useRef(null);
