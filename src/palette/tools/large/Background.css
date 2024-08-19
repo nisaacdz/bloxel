@@ -3,8 +3,8 @@
     align-items: center;
     justify-content: center;
     height: 35px;
-    width: 150px;
-    border: 1px solid white;
+    width: 140px;
+    border: 1px solid rgb(120, 120, 120);
     gap: 5px;
     border-radius: 5px;
 }
@@ -12,6 +12,7 @@
 .background-preview {
     width: 18px;
     height: 18px;
+    border-radius: 5px;
 }
 
 .background-preview.active {

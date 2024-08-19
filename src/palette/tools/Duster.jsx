@@ -5,7 +5,7 @@ const DusterTool = ({ updateActiveTool }) => {
     updateActiveTool(1);
   };
   return (
-    <div
+    <button
       id="duster-tool"
       className="simple-btn active"
       title="duster"
@@ -16,7 +16,7 @@ const DusterTool = ({ updateActiveTool }) => {
         src="./duster.svg"
         alt="duster-img"
       />
-    </div>
+    </button>
   );
 };
 

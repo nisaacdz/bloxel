@@ -1,14 +1,16 @@
 #palette {
   position: absolute;
-  height: 44px;
-  width: 660px;
+  height: 45px;
+  width: 600px;
   display: flex;
   align-items: center;
   gap: 5px;
   justify-content: center;
-  background-color: rgb(80, 90, 100);
+  background-color: rgb(40, 50, 60);
   z-index: 99;
-  border-radius: 5px;
+  border-radius: 6px;
+  border: 1px solid rgb(128, 128, 128);
+  box-sizing: border-box;
 }
 
 #palette-collapsed {
@@ -23,7 +25,7 @@
 .palette-resizer {
   width: 32px;
   height: 32px;
-  border-radius: 4px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -50,10 +52,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid darkgray;
+  border: 1px solid rgb(120, 120, 120);
   background-color: transparent;
   box-sizing: border-box;
-  border-radius: 5px;
+  border-radius: 8px;
 }
 
 .simple-btn.active:hover img {
@@ -62,17 +64,20 @@
 }
 
 .simple-btn.active:active {
-  background-color: darkolivegreen;
-  border-color: black;
+  background-color: rgb(100, 100, 255);
+  border-color: white;
 }
 
 .simple-btn.active {
   border-width: 2px;
-  border-color: white;
+}
+
+.simple-btn.inactive {
+  border-color: rgb(80, 80, 80);
 }
 
 .simple-btn.active:hover:not(:active) {
-  background-color: rgb(102, 102, 102);
+  background-color: rgb(100, 100, 100);
 }
 
 .tool-img {

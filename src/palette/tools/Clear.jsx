@@ -5,7 +5,7 @@ const ClearTool = ({ clearDrawingBoard }) => {
     clearDrawingBoard();
   };
   return (
-    <div
+    <button
       id="clear-tool"
       className="simple-btn active"
       title="clear board"
@@ -16,7 +16,7 @@ const ClearTool = ({ clearDrawingBoard }) => {
         src="./clear.svg"
         alt="clear-img"
       />
-    </div>
+    </button>
   );
 };
 
