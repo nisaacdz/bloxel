@@ -4,7 +4,7 @@ const SaveTool = ({ saveData }) => {
   return (
     <div
       id="save-tool"
-      className="simple-btn active"
+      className="simple-btn inactive"
       title="save presentation"
       onClick={saveData}
     >

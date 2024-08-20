@@ -6,10 +6,7 @@ import React, {
 } from "react";
 import "./Board.css";
 import { BACKGROUNDS, complement, DefaultChalk, DefaultDuster } from "../utils";
-import jsPDF from "jspdf";
 import { CurveInterpolator } from "curve-interpolator";
-import { save } from "@tauri-apps/api/dialog";
-import { writeBinaryFile } from "@tauri-apps/api/fs";
 
 const SCREENS = [null];
 
@@ -131,66 +128,8 @@ function interpolate(activeMouseRef, mouseX, mouseY, contextRef, toolIdx) {
   }
 }
 
-async function savePDF(context, backgroundColor) {
-  const pdf = new jsPDF("landscape");
-  const maxWidth = pdf.internal.pageSize.getWidth();
-  const maxHeight = pdf.internal.pageSize.getHeight();
-
-  const [r1, g1, b1, _] = backgroundColor;
-
-  SCREENS.forEach((oldScreen, index) => {
-    const screen = context.createImageData(oldScreen.width, oldScreen.height);
-    for (let i = 0; i < screen.width * screen.height; i++) {
-      const idx = i * 4;
-      const r2 = oldScreen.data[idx];
-      const g2 = oldScreen.data[idx + 1];
-      const b2 = oldScreen.data[idx + 2];
-      const a2 = oldScreen.data[idx + 3];
-
-      const f2 = a2 / 255;
-      const f1 = 1.0 - f2;
-
-      screen.data[idx] = Math.floor(f1 * r1 + f2 * r2);
-      screen.data[idx + 1] = Math.floor(f1 * g1 + f2 * g2);
-      screen.data[idx + 2] = Math.floor(f1 * b1 + f2 * b2);
-      screen.data[idx + 3] = 255;
-    }
-    let dispWidth = screen.width;
-    let dispHeight = screen.height;
-
-    const widthRatio = maxWidth / dispWidth;
-    const heightRatio = maxHeight / dispHeight;
-    const scaleFactor = Math.min(widthRatio, heightRatio);
-
-    if (scaleFactor < 1) {
-      dispWidth *= scaleFactor;
-      dispHeight *= scaleFactor;
-    }
-
-    const x = (maxWidth - dispWidth) / 2;
-    const y = (maxHeight - dispHeight) / 2;
-
-    if (index > 0) pdf.addPage();
-    pdf.addImage(
-      screen,
-      "JPEG",
-      x,
-      y,
-      dispWidth,
-      dispHeight,
-      undefined,
-      "SLOW"
-    );
-  });
-
-  const filePath = await save({
-    filters: [{ name: "PDF", extensions: ["pdf"] }],
-  });
-
-  if (filePath) {
-    const pdfData = pdf.output("arraybuffer");
-    await writeBinaryFile({ path: filePath, contents: pdfData });
-  }
+async function savePDF(backgroundColor) {
+  
 }
 
 const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
@@ -242,7 +181,7 @@ const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {
       },
       saveData: () => {
         updateScreensArray();
-        savePDF(contextRef.current, BACKGROUNDS[backgroundIdx]);
+        savePDF(BACKGROUNDS[backgroundIdx]);
       },
       withinRect: (x, y) => {
         const rect = canvasRef.current.getBoundingClientRect();

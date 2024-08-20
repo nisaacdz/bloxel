@@ -48,6 +48,7 @@ const Palette = forwardRef(
       handleReset,
       handleLeave,
       handleRestore,
+      handleSettings,
     },
     ref
   ) => {
@@ -236,7 +237,7 @@ const Palette = forwardRef(
           <LeaveApp handleLeave={handleLeave}/>
           <FullScreen handleRestore={handleRestore}/>
           <SaveTool saveData={saveData} />
-          <SettingsTool />
+          <SettingsTool handleSettings={handleSettings}/>
           <button className="palette-resizer collapse" onClick={onCollapse}>
             <img src="./min.svg" alt="minimize palette" />
           </button>

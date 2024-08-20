@@ -14,6 +14,12 @@ import Pointer from "./Pointer";
 import PageNumber from "./Page";
 import { appWindow } from "@tauri-apps/api/window";
 
+const PREMIUM_WALL_MESSAGE =
+  "You need to buy the premium version of this software to access this feature!";
+const RESET_SESSSION_MESSAGE = "Are you sure you want to start a new session?";
+const CLOSE_APP_MESSAGE =
+  "Are you sure you want to close this app? \nAll unsaved data will be lost!";
+
 function App() {
   const boardRef = useRef(null);
   const paletteRef = useRef(null);
@@ -76,11 +82,11 @@ function App() {
   };
 
   const saveData = () => {
-    boardRef.current.saveData();
+    alert(PREMIUM_WALL_MESSAGE);
   };
 
   const handleReset = async () => {
-    if (await confirm("Are you sure you want to start a new session?")) {
+    if (await confirm(RESET_SESSSION_MESSAGE)) {
       setScreenData(boardRef.current.reset());
       updateBackgroundIdx(0);
       updateColorIdx(0);
@@ -96,13 +102,13 @@ function App() {
   };
 
   const handleLeave = async () => {
-    if (
-      await confirm(
-        "Are you sure you want to close this app? \nAll unsaved data will be lost!"
-      )
-    ) {
+    if (await confirm(CLOSE_APP_MESSAGE)) {
       await appWindow.close();
     }
+  };
+
+  const handleSettings = async () => {
+    alert(PREMIUM_WALL_MESSAGE);
   };
 
   const withinDrawingZone = (x, y) => {
@@ -125,7 +131,7 @@ function App() {
       if (screenData.idx > 0) {
         prevPage();
       } else {
-        //
+        // Do nothing
       }
     } else if (code == 39) {
       if (screenData.idx + 1 < screenData.size) {
@@ -164,6 +170,7 @@ function App() {
         handleReset={handleReset}
         handleLeave={handleLeave}
         handleRestore={handleRestore}
+        handleSettings={handleSettings}
       />
       <PageNumber screenData={screenData} />
       <Pointer
