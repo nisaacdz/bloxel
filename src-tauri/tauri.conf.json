@@ -16,6 +16,9 @@
         "all": false,
         "open": true
       },
+      "path": {
+        "all": true
+      },
       "dialog": {
         "all": false,
         "ask": false,
@@ -31,7 +34,8 @@
       },
       "fs": {
         "all": false,
-        "writeFile": true
+        "writeFile": true,
+        "scope": ["**"]
       }
     },
     "windows": [

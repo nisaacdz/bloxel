@@ -7,6 +7,8 @@ import React, {
 import "./Board.css";
 import { BACKGROUNDS, complement, DefaultChalk, DefaultDuster } from "../utils";
 import { CurveInterpolator } from "curve-interpolator";
+import { invoke, path } from "@tauri-apps/api";
+import { writeBinaryFile, BaseDirectory } from "@tauri-apps/api/fs";
 
 const SCREENS = [null];
 
@@ -129,7 +131,15 @@ function interpolate(activeMouseRef, mouseX, mouseY, contextRef, toolIdx) {
 }
 
 async function savePDF(backgroundColor) {
-  
+  const cacheDir = await invoke("reset_cache");
+  console.log(cacheDir);
+  const tasks = SCREENS.map(async (screen, idx) => {
+    await writeBinaryFile(`${cacheDir}\\screen${idx + 1}.cache`, screen.data.buffer, {
+      dir: BaseDirectory.AppCache,
+    });
+  });
+  await Promise.all(tasks);
+  await invoke("save_pdf", { background: backgroundColor });
 }
 
 const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {

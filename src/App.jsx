@@ -82,7 +82,7 @@ function App() {
   };
 
   const saveData = () => {
-    alert(PREMIUM_WALL_MESSAGE);
+    boardRef.current.saveData();
   };
 
   const handleReset = async () => {
