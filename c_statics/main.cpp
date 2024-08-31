@@ -2,13 +2,13 @@
 #include <vector>
 #include <stdexcept>
 #include <filesystem>
-#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 #include "hpdf.h"
 
 
-// g++ main.cpp -I"./c_statics/lib/libharu/include" -I"./c_statics/lib/libharu/build/include" -L"./c_statics/lib/libharu/build/lib" -lhpdf -o main.exe
-// g++ main.cpp -I"C:/Users/nisaacdz/desktop/workspace/bloxel/c_statics/lib/libharu/include" -I"C:/Users/nisaacdz/desktop/workspace/bloxel/c_statics/lib/libharu/build/include" -L"C:/Users/nisaacdz/desktop/workspace/bloxel/c_statics/lib/libharu/build/lib" -lhpdf -o main.exe
+// g++ main.cpp -I"./libs/libharu/include" -I"./libs/libharu/build/include" -L"./libs/libharu/build/src/Debug" -lhpdf -o main.exe
+// g++ main.cpp -I"./libs/libharu/include" -I"./libs/libharu/build/include" -o main.exe
+// g++ main.cpp -I"C:/Users/nisaacdz/desktop/workspace/bloxel/c_statics/libs/libharu/include" -I"C:/Users/nisaacdz/desktop/workspace/bloxel/c_statics/libs/libharu/build/include" -L"C:/Users/nisaacdz/desktop/workspace/bloxel/c_statics/libs/libharu/build/lib" -lhpdf -o main.exe
 
 void process(const std::string &folderPath, int width, int height)
 {
