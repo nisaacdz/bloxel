@@ -1,112 +1,77 @@
-#include <fstream>
-#include <vector>
-#include <stdexcept>
+#include <hpdf.h>
+#include <iostream>
 #include <filesystem>
-#include "stb_image_write.h"
-#include "hpdf.h"
+#include <stdexcept>
+#include <string>
 
+namespace fs = std::filesystem;
 
-// g++ main.cpp -I"./libs/libharu/include" -I"./libs/libharu/build/include" -L"./libs/libharu/build/src/Debug" -lhpdf -o main.exe
-// g++ main.cpp -I"./libs/libharu/include" -I"./libs/libharu/build/include" -o main.exe
-// g++ main.cpp -I"C:/Users/nisaacdz/desktop/workspace/bloxel/c_statics/libs/libharu/include" -I"C:/Users/nisaacdz/desktop/workspace/bloxel/c_statics/libs/libharu/build/include" -L"C:/Users/nisaacdz/desktop/workspace/bloxel/c_statics/libs/libharu/build/lib" -lhpdf -o main.exe
-
-void process(const std::string &folderPath, int width, int height)
+extern "C" __declspec(dllexport) void process(const fs::path folderPath)
 {
-    // Initialize PDF document
-    HPDF_Doc pdf = HPDF_New(NULL, NULL);
-    if (!pdf)
+    try
     {
-        throw std::runtime_error("Failed to create PDF object.");
-    }
-
-    // Open directory and list files
-    std::vector<std::filesystem::path> fileNames;
-    for (const auto &entry : std::filesystem::directory_iterator(folderPath))
-    {
-        if (entry.is_regular_file())
+        // Initialize PDF document
+        HPDF_Doc pdf = HPDF_New(nullptr, nullptr);
+        if (!pdf)
         {
-            fileNames.push_back(entry.path());
-        }
-    }
-
-    for (const auto &filePath : fileNames)
-    {
-        // Read the raw RGBA data
-        std::ifstream file(filePath, std::ios::binary);
-        if (!file)
-        {
-            throw std::runtime_error("Failed to open a file");
+            throw std::runtime_error("Failed to create PDF document");
         }
 
-        std::vector<unsigned char> buffer(width * height * 4); // 4 channels (RGBA)
-        file.read(reinterpret_cast<char *>(buffer.data()), buffer.size());
-
-        // Ensure the file was read correctly
-        if (!file)
+        for (const auto &entry : fs::directory_iterator(folderPath))
         {
-            throw std::runtime_error("Failed to read a full image data.");
-        }
+            HPDF_Page page = HPDF_AddPage(pdf);
+            HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_A4, HPDF_PAGE_LANDSCAPE);
+            HPDF_Image image = HPDF_LoadPngImageFromFile(pdf, entry.path().string().c_str());
 
-        // Compress the image buffer to PNG format (in memory)
-        std::vector<unsigned char> png_data;
-        stbi_write_png_to_func(
-            [](void *context, void *data, int size)
+            float imgWidth = HPDF_Image_GetWidth(image);
+            float imgHeight = HPDF_Image_GetHeight(image);
+
+            float pageWidth = HPDF_Page_GetWidth(page);
+            float pageHeight = HPDF_Page_GetHeight(page);
+
+            float heightRatio = imgHeight / pageHeight;
+            float widthRatio = imgWidth / pageWidth;
+
+            float scaledImgHeight, scaledImgWidth;
+
+            if (heightRatio > widthRatio)
             {
-                std::vector<unsigned char> *png_data = static_cast<std::vector<unsigned char> *>(context);
-                png_data->insert(png_data->end(), static_cast<unsigned char *>(data), static_cast<unsigned char *>(data) + size);
-            },
-            &png_data, width, height, 4, buffer.data(), width * 4);
+                scaledImgHeight = pageHeight;
+                scaledImgWidth = (imgWidth * scaledImgHeight) / imgHeight;
+            }
+            else
+            {
+                scaledImgWidth = pageWidth;
+                scaledImgHeight = (imgHeight * scaledImgWidth) / imgWidth;
+            }
 
-        // Create a new page in the PDF
-        HPDF_Page page = HPDF_AddPage(pdf);
-        HPDF_Page_SetSize(page, HPDF_PageSizes::HPDF_PAGE_SIZE_A4, HPDF_PageDirection::HPDF_PAGE_LANDSCAPE);
+            float x = (pageWidth - scaledImgWidth) / 2;
+            float y = (pageHeight - scaledImgHeight) / 2;
 
-        float pageWidth = HPDF_Page_GetWidth(page);
-        float pageHeight = HPDF_Page_GetHeight(page);
-
-        // Calculate aspect ratio to maintain the image proportions
-        float aspectRatio = static_cast<float>(width) / static_cast<float>(height);
-
-        float scaledWidth, scaledHeight;
-
-        if (pageWidth / width > pageHeight / height)
-        {
-            scaledWidth = pageWidth;
-            scaledHeight = scaledWidth / aspectRatio;
-        }
-        else
-        {
-            scaledHeight = pageHeight;
-            scaledWidth = scaledHeight * aspectRatio;
+            HPDF_Page_DrawImage(page, image, x, y, scaledImgWidth, scaledImgHeight);
         }
 
-        // Center the image on the page
-        float xOffset = (pageWidth - scaledWidth) / 2;
-        float yOffset = (pageHeight - scaledHeight) / 2;
+        // Save the PDF
+        fs::path outputPath = folderPath.parent_path().parent_path().append("screens_output_data").append("output.pdf");
+        fs::create_directory(outputPath.parent_path());
+        
+        HPDF_SaveToFile(pdf, outputPath.string().c_str());
 
-        // Load the PNG data into the PDF as an image
-        HPDF_Image image = HPDF_LoadPngImageFromMem(pdf, png_data.data(), png_data.size());
-        if (!image)
-        {
-            throw std::runtime_error("Failed to load PNG image from memory.");
-        }
+        // Clean up
+        HPDF_Free(pdf);
 
-        // Draw the image on the PDF page
-        HPDF_Page_DrawImage(page, image, xOffset, yOffset, scaledWidth, scaledHeight);
+        std::cout << "PDF created successfully at: " << outputPath << std::endl;
     }
-
-    // Save the PDF
-    HPDF_SaveToFile(pdf, "output.pdf");
-
-    // Clean up
-    HPDF_Free(pdf);
+    catch (const std::exception &e)
+    {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
 }
 
 int main()
 {
-    std::string folderPath = "C:\\Users\\nisaacdz\\AppData\\Local\\com.tauri.bloxel\\screens_cache_data";
-    int width = 1366;
-    int height = 768;
-    process(folderPath, width, height);
+    std::cout << "Hello, World!" << std::endl;
+    fs::path data_dir("C:\\Users\\nisaacdz\\AppData\\Local\\com.tauri.bloxel\\screens_image_data\\");
+    process(data_dir);
     return 0;
 }

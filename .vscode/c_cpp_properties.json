@@ -3,9 +3,7 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**",
-                "${workspaceFolder}/c_statics/libs/libharu/include",
-                "${workspaceFolder}/c_statics/libs/libharu/build/include"
+                "${workspaceFolder}/**"
             ],
             "defines": [
                 "_DEBUG",

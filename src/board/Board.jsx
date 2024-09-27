@@ -132,9 +132,8 @@ function interpolate(activeMouseRef, mouseX, mouseY, contextRef, toolIdx) {
 
 async function savePDF(backgroundColor) {
   const cacheDir = await invoke("reset_cache");
-  console.log(cacheDir);
   const tasks = SCREENS.map(async (screen, idx) => {
-    await writeBinaryFile(`${cacheDir}\\screen${idx + 1}.cache`, screen.data.buffer, {
+    await writeBinaryFile(`${cacheDir}\\screen${idx + 1}`, screen.data.buffer, {
       dir: BaseDirectory.AppCache,
     });
   });
