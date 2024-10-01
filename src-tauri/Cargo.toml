@@ -8,12 +8,13 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "1.5", features = [] }
+tauri-build = { version = "1.5.5", features = [] }
 
 [dependencies]
 tauri = { version = "1.5", features = [ "path-all", "dialog-message", "window-all", "fs-write-file", "dialog-save", "dialog-confirm", "shell-open"] }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
+serde = { version = "1.0.210", features = ["derive"] }
+serde_json = "1.0.128"
+backend = { path = "../backend" }
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

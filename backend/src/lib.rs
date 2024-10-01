@@ -2,26 +2,17 @@ use std::{ffi::CString, path::PathBuf, thread};
 
 use image::Rgba;
 
-pub fn save(cache_dir: PathBuf, width: u32, height: u32, background: [u8; 3]) -> PathBuf{
+pub fn save(cache_dir: PathBuf, width: u32, height: u32, background: [u8; 4]) -> PathBuf{
     let data_dir = cache_dir.join("data");
-    generate_images(&data_dir, width, height, background);
     let img_dir = cache_dir.join("image");
-    call_pdf_generator(&img_dir);
+    generate_images(&data_dir, &img_dir, width, height, background);
+    //call_pdf_generator(&img_dir);
     let pdf_dir = cache_dir.join("output");
     pdf_dir.join("output.pdf")
 }
 
-pub fn call_pdf_generator(img_dir: &PathBuf) {
-    let img_dir_str = img_dir.to_str().unwrap();
-    let img_dir = CString::new(img_dir_str).expect("Failed to create the CString");
-    unsafe {
-        process(img_dir.as_ptr());
-    }
-}
-
-pub fn generate_images(data_dir: &PathBuf, width: u32, height: u32, background: [u8; 3]) {
-    let parent_dir = &data_dir.parent().unwrap().join("screens_image_data");
-    std::fs::create_dir_all(&parent_dir).unwrap();
+pub fn generate_images(data_dir: &PathBuf, image_dir: &PathBuf,  width: u32, height: u32, background: [u8; 4]) {
+    std::fs::create_dir_all(&image_dir).unwrap();
     thread::scope(|s| {
         for entry in std::fs::read_dir(data_dir).unwrap() {
             let child = entry.unwrap().path();
@@ -42,7 +33,7 @@ pub fn generate_images(data_dir: &PathBuf, width: u32, height: u32, background: 
                 let newname =
                     format! {"{}.png", child.file_name().unwrap_or_default().to_str().unwrap() };
                 img_buffer
-                    .save_with_format(parent_dir.join(newname), image::ImageFormat::Png)
+                    .save_with_format(image_dir.join(newname), image::ImageFormat::Png)
                     .unwrap();
             });
         }
@@ -54,7 +45,16 @@ pub fn combine(channel1: u8, channel2: u8, ratio: u32) -> u8 {
     res as _
 }
 
-#[link(name = "c_statics")]
-extern "C" {
-    fn process(input_path: *const i8);
-}
+
+// pub fn call_pdf_generator(img_dir: &PathBuf) {
+//     let img_dir_str = img_dir.to_str().unwrap();
+//     let img_dir = CString::new(img_dir_str).expect("Failed to create the CString");
+//     unsafe {
+//         process(img_dir.as_ptr());
+//     }
+// }
+
+// #[link(name = "c_statics")]
+// extern "C" {
+//     fn process(input_path: *const i8);
+// }

@@ -1,32 +1,3 @@
 {
-    "files.associations": {
-        "algorithm": "cpp",
-        "bit": "cpp",
-        "charconv": "cpp",
-        "chrono": "cpp",
-        "filesystem": "cpp",
-        "format": "cpp",
-        "initializer_list": "cpp",
-        "iomanip": "cpp",
-        "iterator": "cpp",
-        "locale": "cpp",
-        "memory": "cpp",
-        "ostream": "cpp",
-        "sstream": "cpp",
-        "string": "cpp",
-        "system_error": "cpp",
-        "type_traits": "cpp",
-        "typeinfo": "cpp",
-        "utility": "cpp",
-        "vector": "cpp",
-        "xlocale": "cpp",
-        "xlocbuf": "cpp",
-        "xlocinfo": "cpp",
-        "xlocmon": "cpp",
-        "xlocnum": "cpp",
-        "xloctime": "cpp",
-        "xmemory": "cpp",
-        "xstring": "cpp",
-        "xutility": "cpp"
-    }
+    "cmake.sourceDirectory": "C:/Users/nisaacdz/Desktop/workspace/bloxel/c_statics"
 }

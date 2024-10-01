@@ -138,7 +138,11 @@ async function savePDF(backgroundColor) {
     });
   });
   await Promise.all(tasks);
-  await invoke("save_pdf", { background: backgroundColor });
+  await invoke("save_pdf", {
+    width: screen.width,
+    height: screen.height,
+    background: backgroundColor,
+  });
 }
 
 const Board = forwardRef(({ toolIdx, backgroundIdx }, ref) => {

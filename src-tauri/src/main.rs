@@ -10,7 +10,9 @@ fn main() {
             app.get_window("main").map(|window| {
                 window.set_fullscreen(true).ok();
             });
-            CACHE_DIR.set(app.path_resolver().app_cache_dir().unwrap()).ok();
+            CACHE_DIR
+                .set(app.path_resolver().app_cache_dir().unwrap())
+                .ok();
             Ok(())
         })
         .invoke_handler(generate_handler![save_pdf, reset_cache])
@@ -19,9 +21,8 @@ fn main() {
 }
 
 #[tauri::command]
-fn save_pdf(background: [u8; 4]) {
-    println!("Saving PDF with background {:?}", background);
-    tauri::api::path::cache_dir();
+fn save_pdf(width: u32, height: u32, background: [u8; 4]) {
+    backend::save(CACHE_DIR.get().unwrap().clone(), width, height, background);
 }
 
 fn clear_dir(dir: &PathBuf) {
@@ -42,17 +43,17 @@ fn clear_dir(dir: &PathBuf) {
 
 #[tauri::command]
 fn reset_cache() -> String {
-    let cache_dir = cache_dir();
-    if cache_dir.exists() {
-        clear_dir(&cache_dir);
+    let data_dir = data_dir();
+    if data_dir.exists() {
+        clear_dir(&data_dir);
     } else {
-        std::fs::create_dir(&cache_dir).unwrap();
+        std::fs::create_dir(&data_dir).unwrap();
     }
-    cache_dir.to_str().unwrap().to_owned()
+    data_dir.to_str().unwrap().to_owned()
 }
 
 static CACHE_DIR: OnceLock<PathBuf> = OnceLock::new();
 
-fn cache_dir() -> PathBuf {
-    CACHE_DIR.get().unwrap().join("screens_cache_data")
+fn data_dir() -> PathBuf {
+    CACHE_DIR.get().unwrap().join("data")
 }
