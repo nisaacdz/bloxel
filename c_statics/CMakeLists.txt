@@ -1,9 +1,20 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.15)
+project(CStaticLibraryExample)
 
-project(c_statics)
+# Set the C++ standard
+set(CMAKE_CXX_STANDARD 17)
 
-find_package(libharu CONFIG REQUIRED)
+# Enable static linking
+set(BUILD_SHARED_LIBS OFF)
 
-add_executable(c_statics main.cpp)
+# Set vcpkg toolchain
+set(CMAKE_TOOLCHAIN_FILE "C:/vcpkg/scripts/buildsystems/vcpkg.cmake")
 
-target_link_libraries(c_statics PRIVATE libharu::lobharu)
+# Add the library
+add_library(c_statics STATIC main.cpp)
+
+# Link the PoDoFo library
+target_link_libraries(c_statics PRIVATE Podofo)
+
+# Add the include directories for PoDoFo
+target_include_directories(c_statics PRIVATE ${PODOFO_INCLUDE_DIRS})

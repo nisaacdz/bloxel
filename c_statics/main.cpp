@@ -1,4 +1,4 @@
-#include <hpdf.h>
+#include <podofo/podofo.h>
 #include <iostream>
 #include <filesystem>
 #include <stdexcept>
@@ -6,72 +6,43 @@
 
 namespace fs = std::filesystem;
 
-extern "C" __declspec(dllexport) void process(const fs::path folderPath)
+extern "C" const char* process(const char* imagesFolder, const char* outputFolder)
 {
     try
     {
-        // Initialize PDF document
-        HPDF_Doc pdf = HPDF_New(nullptr, nullptr);
-        if (!pdf)
+        PoDoFo::PdfMemDocument pdfDocument;
+
+        for (const auto& entry : fs::directory_iterator(imagesFolder))
         {
-            throw std::runtime_error("Failed to create PDF document");
+            if (entry.is_regular_file() && entry.path().extension() == ".png") // Only process PNG images
+            {
+                PoDoFo::PdfPage* page = pdfDocument.CreatePage(PoDoFo::PdfPage::CreatePageSize(PoDoFo::ePdfPageSize_A4));
+                pdfDocument.PushPage(page);
+
+                // Load the image
+                PoDoFo::PdfImage image;
+                image.LoadFromFile(entry.path().string().c_str());
+
+                // Draw the image onto the page
+                // You'll need to define the width and height based on your requirements
+                float x = 50; // X position
+                float y = 50; // Y position
+                float width = 500; // Width to draw the image
+                float height = 500; // Height to draw the image
+                page->DrawImage(image, x, y, width, height);
+            }
         }
 
-        for (const auto &entry : fs::directory_iterator(folderPath))
-        {
-            HPDF_Page page = HPDF_AddPage(pdf);
-            HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_A4, HPDF_PAGE_LANDSCAPE);
-            HPDF_Image image = HPDF_LoadPngImageFromFile(pdf, entry.path().string().c_str());
+        fs::path outputFilePath = fs::path(outputFolder) / "output.pdf";
+        fs::create_directories(outputFolder); // Ensure the output folder exists
+        pdfDocument.Write(outputFilePath.string().c_str());
 
-            float imgWidth = HPDF_Image_GetWidth(image);
-            float imgHeight = HPDF_Image_GetHeight(image);
-
-            float pageWidth = HPDF_Page_GetWidth(page);
-            float pageHeight = HPDF_Page_GetHeight(page);
-
-            float heightRatio = imgHeight / pageHeight;
-            float widthRatio = imgWidth / pageWidth;
-
-            float scaledImgHeight, scaledImgWidth;
-
-            if (heightRatio > widthRatio)
-            {
-                scaledImgHeight = pageHeight;
-                scaledImgWidth = (imgWidth * scaledImgHeight) / imgHeight;
-            }
-            else
-            {
-                scaledImgWidth = pageWidth;
-                scaledImgHeight = (imgHeight * scaledImgWidth) / imgWidth;
-            }
-
-            float x = (pageWidth - scaledImgWidth) / 2;
-            float y = (pageHeight - scaledImgHeight) / 2;
-
-            HPDF_Page_DrawImage(page, image, x, y, scaledImgWidth, scaledImgHeight);
-        }
-
-        // Save the PDF
-        fs::path outputPath = folderPath.parent_path().parent_path().append("screens_output_data").append("output.pdf");
-        fs::create_directory(outputPath.parent_path());
-        
-        HPDF_SaveToFile(pdf, outputPath.string().c_str());
-
-        // Clean up
-        HPDF_Free(pdf);
-
-        std::cout << "PDF created successfully at: " << outputPath << std::endl;
+        std::cout << "PDF created successfully at: " << outputFilePath << std::endl;
+        return "ok"; // Success
     }
-    catch (const std::exception &e)
+    catch (const std::exception& e)
     {
         std::cerr << "Error: " << e.what() << std::endl;
+        return e.what(); // Return the error message
     }
-}
-
-int main()
-{
-    std::cout << "Hello, World!" << std::endl;
-    fs::path data_dir("C:\\Users\\nisaacdz\\AppData\\Local\\com.tauri.bloxel\\screens_image_data\\");
-    process(data_dir);
-    return 0;
 }

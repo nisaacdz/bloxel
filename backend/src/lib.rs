@@ -1,14 +1,19 @@
-use std::{ffi::CString, path::PathBuf, thread};
+use std::{ffi::{CStr, CString}, path::PathBuf, thread};
 
 use image::Rgba;
 
-pub fn save(cache_dir: PathBuf, width: u32, height: u32, background: [u8; 4]) -> PathBuf{
+
+#[link(name = "c_statics")]
+extern "C" {
+    fn process(input_path: *const i8, output_path: *const i8) -> *const i8; // Update with output path
+}
+
+pub fn save(cache_dir: PathBuf, width: u32, height: u32, background: [u8; 4]) {
     let data_dir = cache_dir.join("data");
     let img_dir = cache_dir.join("image");
+    let output_dir = cache_dir.join("output");
     generate_images(&data_dir, &img_dir, width, height, background);
-    //call_pdf_generator(&img_dir);
-    let pdf_dir = cache_dir.join("output");
-    pdf_dir.join("output.pdf")
+    call_pdf_generator(&img_dir, &output_dir);
 }
 
 pub fn generate_images(data_dir: &PathBuf, image_dir: &PathBuf,  width: u32, height: u32, background: [u8; 4]) {
@@ -45,16 +50,23 @@ pub fn combine(channel1: u8, channel2: u8, ratio: u32) -> u8 {
     res as _
 }
 
+pub fn call_pdf_generator(img_dir: &PathBuf, output_dir: &PathBuf) {
+    // Convert Rust PathBuf to C string
+    let input_path_c = CString::new(img_dir.to_string_lossy().as_bytes()).unwrap();
+    let output_path_c = CString::new(output_dir.to_string_lossy().as_bytes()).unwrap();
 
-// pub fn call_pdf_generator(img_dir: &PathBuf) {
-//     let img_dir_str = img_dir.to_str().unwrap();
-//     let img_dir = CString::new(img_dir_str).expect("Failed to create the CString");
-//     unsafe {
-//         process(img_dir.as_ptr());
-//     }
-// }
+    unsafe {
+        // Call the C function
+        let result = process(input_path_c.as_ptr(), output_path_c.as_ptr());
 
-// #[link(name = "c_statics")]
-// extern "C" {
-//     fn process(input_path: *const i8);
-// }
+        // Convert the returned pointer to a Rust string
+        if !result.is_null() {
+            let c_str = CStr::from_ptr(result);
+            let result_str = c_str.to_string_lossy();
+
+            println!("C function returned: {}", result_str);
+        } else {
+            println!("C function returned a null pointer.");
+        }
+    }
+}
