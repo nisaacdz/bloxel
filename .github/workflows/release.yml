@@ -1,61 +1,90 @@
+# The name of your GitHub Actions workflow.
 name: 'Build and Release Bloxel'
 
+# This workflow runs on every push to the `main` branch.
 on:
   push:
     branches:
-      - main # Triggers the workflow on each push to the main branch
+      - main
 
 jobs:
+  # Define a single job that will be run on a matrix of platforms.
   build-and-release:
+    # Human-readable name for the job.
     name: 'Build and Release'
+
+    # This is crucial. It gives the workflow permission to write to your repository,
+    # which is necessary for creating a GitHub Release and its associated Git tag.
     permissions:
-      contents: write # Needed to create the release and upload assets
+      contents: write
+
+    # Use a build matrix to run the job on both Windows and Linux.
     strategy:
       fail-fast: false
       matrix:
-        platform: [ubuntu-latest, windows-latest] # Build for Linux and Windows
+        platform: [windows-latest, ubuntu-latest]
 
+    # The virtual machine environment to run the job on, taken from the matrix.
     runs-on: ${{ matrix.platform }}
 
     steps:
+      # Step 1: Check out your repository's code.
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Step 2: Set up the Node.js environment.
+      # The `cache` property automatically handles caching npm dependencies.
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm' # Use 'yarn' or 'pnpm' if you use those.
 
+      # Step 3: Install the stable Rust toolchain.
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Install Linux dependencies (ubuntu only)
+      # Step 4: Add a cache for Rust build artifacts.
+      # This will make subsequent builds much faster.
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      # Step 5: Install Linux-specific dependencies.
+      # This step only runs on the 'ubuntu-latest' runner.
+      - name: Install Linux dependencies
         if: matrix.platform == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
+      # Step 6: Install your frontend dependencies.
       - name: Install frontend dependencies
-        run: npm install
+        run: npm install # Use 'yarn install' or 'pnpm install' if needed.
 
-      - name: Build, Tag, Release, and Upload
+      # Step 7: Build, Tag, Release, and Upload your Tauri application.
+      # This is the final, all-in-one step. It uses the GITHUB_TOKEN to
+      # create a release, then builds and uploads the platform-specific
+      # application bundles to that release.
+      - name: Build and Release
         uses: tauri-apps/tauri-action@v0
         env:
-          # This is the only token you need, and it's automatically provided by GitHub
+          # This token is automatically provided by GitHub.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # The tagName will be read from your tauri.conf.json and prefixed with 'v'
-          # e.g., if version is "1.2.3", the tag will be "v1.2.3"
-          tagName: bloxel-v__VERSION__ # The action replaces __VERSION__ with the version from your tauri.conf.json
+          # The action will replace `__VERSION__` with the version from your `tauri.conf.json`.
+          # For example, if your app version is "1.2.3", the tag will be "bloxel-v1.2.3".
+          tagName: 'bloxel-v__VERSION__'
 
-          # The release name will also use the version from the config file
+          # The name of the GitHub release.
           releaseName: 'Bloxel v__VERSION__'
 
-          # A brief description for the release body
-          releaseBody: 'New release of the Bloxel application.'
-          
-          # Set to false to publish the release immediately
+          # A description for the release body.
+          releaseBody: 'New automated release of the Bloxel application.'
+
+          # Set to `false` to publish the release immediately.
           releaseDraft: false
 
-          # Set to false for a full release
+          # Set to `false` to indicate a full production release.
           prerelease: false
